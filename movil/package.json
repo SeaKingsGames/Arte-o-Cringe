@@ -1,0 +1,19 @@
+{
+  "name": "arte-o-cringe-movil",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Arte o Cringe empaquetado como app de Android con Capacitor",
+  "scripts": {
+    "copiar": "node copiar-web.mjs",
+    "preparar": "node copiar-web.mjs && npx cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.2",
+    "@capacitor/core": "8.5.2",
+    "@capacitor/filesystem": "8.1.3",
+    "@capacitor/share": "8.0.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.2"
+  }
+}
