@@ -1,0 +1,199 @@
+# Construye Arte o Cringe para Android cada vez que subes cambios a GitHub.
+# Para descargarlo: pestaña Actions → la ejecución más reciente → sección "Artifacts".
+#   arte-o-cringe-apk        → APK de prueba, para instalar en tu celular.
+#   arte-o-cringe-playstore  → AAB firmado para subir a Google Play (solo si configuraste la llave).
+#   arte-o-cringe-firmado    → APK firmado con tu llave (solo si configuraste la llave).
+# La llave se configura en Settings → Secrets and variables → Actions con dos secretos:
+#   KEYSTORE_BASE64 y KEYSTORE_PASSWORD.
+# El ícono y la pantalla de inicio salen de icono.png, icono-frente.png y splash.png en la raíz del repo.
+name: APK de Android
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    env:
+      KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      AOC_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      AOC_KEY_ALIAS: arteocringe
+      VERSION_CODE: ${{ github.run_number }}
+    defaults:
+      run:
+        working-directory: movil
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      # v4 ya no pide el paquete 'tools' que Google retiró (era el error de la v3).
+      - uses: android-actions/setup-android@v4
+
+      - name: Instalar Capacitor
+        run: npm install
+
+      - name: Copiar el juego a la app
+        run: node copiar-web.mjs
+
+      - name: Crear el proyecto de Android
+        run: npx cap add android
+
+      - name: Sincronizar
+        run: npx cap sync android
+
+      # Ícono y pantalla de inicio desde icono.png, icono-frente.png y splash.png (raíz del repo).
+      - name: Ícono y pantalla de inicio
+        if: hashFiles('icono.png', 'icono-frente.png', 'splash.png') != ''
+        run: |
+          npm install --no-save sharp@0.34.5
+          cat > iconos.mjs <<'EOF'
+          // Pone el ícono y la pantalla de inicio de Arte o Cringe en el proyecto de Android.
+          // Usa icono.png, icono-frente.png y splash.png de la raíz del repositorio.
+          import sharp from 'sharp';
+          import { readdirSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+          import { join } from 'node:path';
+
+          const raiz = '..';
+          const res = join('android', 'app', 'src', 'main', 'res');
+          const FONDO = '#123c45';
+          const fuente = (n) => { const p = join(raiz, n); if (!existsSync(p)) throw new Error(`Falta ${n} en la raíz del repositorio`); return p; };
+          const icono = fuente('icono.png'), frente = fuente('icono-frente.png'), splash = fuente('splash.png');
+
+          const DENS = { mdpi: 1, hdpi: 1.5, xhdpi: 2, xxhdpi: 3, xxxhdpi: 4 };
+          const fondoSvg = (s) => Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}"><defs><radialGradient id="g" cx=".5" cy=".08" r=".75"><stop offset="0" stop-color="#2a6a76"/><stop offset=".55" stop-color="#123c45"/><stop offset="1" stop-color="#0b2a31"/></radialGradient></defs><rect width="${s}" height="${s}" fill="url(#g)"/></svg>`);
+          const circulo = (s) => Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}"><circle cx="${s / 2}" cy="${s / 2}" r="${s / 2}"/></svg>`);
+
+          for (const [d, k] of Object.entries(DENS)) {
+            const dir = join(res, `mipmap-${d}`); mkdirSync(dir, { recursive: true });
+            const capa = Math.round(108 * k), leg = Math.round(48 * k);
+            await sharp(frente).resize(capa, capa).png().toFile(join(dir, 'ic_launcher_foreground.png'));
+            await sharp(fondoSvg(capa)).png().toFile(join(dir, 'ic_launcher_background.png'));
+            await sharp(icono).resize(leg, leg).png().toFile(join(dir, 'ic_launcher.png'));
+            await sharp(icono).resize(leg, leg).composite([{ input: circulo(leg), blend: 'dest-in' }]).png().toFile(join(dir, 'ic_launcher_round.png'));
+          }
+          const adaptable = `<?xml version="1.0" encoding="utf-8"?>
+          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+              <background android:drawable="@mipmap/ic_launcher_background"/>
+              <foreground android:drawable="@mipmap/ic_launcher_foreground"/>
+          </adaptive-icon>
+          `;
+          mkdirSync(join(res, 'mipmap-anydpi-v26'), { recursive: true });
+          for (const n of ['ic_launcher.xml', 'ic_launcher_round.xml']) writeFileSync(join(res, 'mipmap-anydpi-v26', n), adaptable);
+
+          // Pantalla de inicio: reemplaza cada splash.png de la plantilla con el nuestro, recortado al mismo tamaño.
+          let n = 0;
+          for (const carpeta of readdirSync(res).filter((c) => c.startsWith('drawable'))) {
+            const p = join(res, carpeta, 'splash.png');
+            if (!existsSync(p)) continue;
+            const { width, height } = await sharp(p).metadata();
+            const img = await sharp(splash).resize(width, height, { fit: 'cover' }).png().toBuffer();
+            writeFileSync(p, img); n++;
+          }
+          if (!n) throw new Error('No encontré splash.png en la plantilla de Android');
+
+          // Android 12 o más nuevo: fondo del arranque con el color del juego.
+          const estilos = join(res, 'values', 'styles.xml');
+          let x = readFileSync(estilos, 'utf8');
+          const ini = '<style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">';
+          if (!x.includes(ini)) throw new Error('No encontré el tema de arranque en styles.xml');
+          if (!x.includes('windowSplashScreenBackground')) x = x.replace(ini, `${ini}\n        <item name="windowSplashScreenBackground">${FONDO}</item>`);
+          writeFileSync(estilos, x);
+          writeFileSync(join(res, 'values', 'ic_launcher_background.xml'), `<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">${FONDO}</color>\n</resources>\n`);
+          console.log(`Ícono listo y ${n} pantallas de inicio reemplazadas`);
+          EOF
+          node iconos.mjs
+
+      - name: Preparar la llave de firma
+        if: env.KEYSTORE_BASE64 != ''
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/arte-o-cringe.jks"
+          echo "AOC_KEYSTORE=$RUNNER_TEMP/arte-o-cringe.jks" >> "$GITHUB_ENV"
+
+      # El script va aquí mismo para que no dependa de subir otro archivo.
+      - name: Versión y firma
+        run: |
+          cat > preparar-android.mjs <<'EOF'
+          // Ajusta el proyecto de Android que genera Capacitor antes de compilar:
+          //  - versionCode: un número que sube solo en cada compilación (Google Play exige que siempre suba).
+          //  - versionName: la "version" de package.json (la que ven los jugadores).
+          //  - Firma: si existe la variable AOC_KEYSTORE, la versión release se firma con tu llave.
+          import { readFileSync, writeFileSync } from 'node:fs';
+          import { dirname, join } from 'node:path';
+          import { fileURLToPath } from 'node:url';
+
+          const aqui = dirname(fileURLToPath(import.meta.url));
+          const ruta = join(aqui, 'android', 'app', 'build.gradle');
+          const pkg = JSON.parse(readFileSync(join(aqui, 'package.json'), 'utf8'));
+          let g = readFileSync(ruta, 'utf8');
+
+          function cambiar(antes, despues, que) {
+            if (!antes.test(g)) throw new Error(`No encontré ${que} en build.gradle. ¿Cambió la plantilla de Capacitor?`);
+            g = g.replace(antes, despues);
+          }
+
+          const code = parseInt(process.env.VERSION_CODE || '1', 10);
+          if (!(code >= 1 && code < 2100000000)) throw new Error('VERSION_CODE inválido: ' + process.env.VERSION_CODE);
+          cambiar(/versionCode \d+/, `versionCode ${code}`, 'versionCode');
+          cambiar(/versionName "[^"]*"/, `versionName "${pkg.version}"`, 'versionName');
+
+          if (process.env.AOC_KEYSTORE) {
+            cambiar(/\n    buildTypes \{/, `
+              signingConfigs {
+                  release {
+                      storeFile file(System.getenv("AOC_KEYSTORE"))
+                      storePassword System.getenv("AOC_KEYSTORE_PASSWORD")
+                      keyAlias System.getenv("AOC_KEY_ALIAS")
+                      keyPassword System.getenv("AOC_KEYSTORE_PASSWORD")
+                  }
+              }
+              buildTypes {`, 'buildTypes');
+            cambiar(/(\n        release \{\n)(?!            storeFile)/, '$1            signingConfig signingConfigs.release\n', 'buildTypes.release');
+          }
+
+          writeFileSync(ruta, g);
+          console.log(`Android listo: versionCode ${code}, versionName ${pkg.version}, ${process.env.AOC_KEYSTORE ? 'con firma' : 'sin firma (solo APK de prueba)'}`);
+          EOF
+          node preparar-android.mjs
+
+      - name: Compilar
+        working-directory: movil/android
+        run: |
+          if [ -n "$AOC_KEYSTORE" ]; then
+            ./gradlew assembleDebug assembleRelease bundleRelease --no-daemon
+          else
+            ./gradlew assembleDebug --no-daemon
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arte-o-cringe-apk
+          path: movil/android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 14
+
+      - uses: actions/upload-artifact@v4
+        if: env.AOC_KEYSTORE != ''
+        with:
+          name: arte-o-cringe-playstore
+          path: movil/android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        if: env.AOC_KEYSTORE != ''
+        with:
+          name: arte-o-cringe-firmado
+          path: movil/android/app/build/outputs/apk/release/app-release.apk
+          retention-days: 30
+
+      - name: Borrar la llave del servidor
+        if: always()
+        run: rm -f "$RUNNER_TEMP/arte-o-cringe.jks"
