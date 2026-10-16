@@ -1,0 +1,13 @@
+{
+  "appId": "com.seakingsgames.arteocringe",
+  "appName": "Arte o Cringe",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#123c45"
+  },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "css"
+    }
+  }
+}
