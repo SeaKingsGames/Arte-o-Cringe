@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#123c45">
+<title>Descargar Arte o Cringe</title>
+<meta name="description" content="Instala Arte o Cringe en tu PC o juega en el navegador. Un minuto para dibujar y toda la sala califica: ¿es arte o es cringe?">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Arte o Cringe">
+<meta property="og:title" content="Arte o Cringe: descárgalo gratis">
+<meta property="og:description" content="Un minuto para dibujar. Toda la sala para juzgarte. Instálalo en tu PC o juega en el navegador.">
+<meta property="og:url" content="https://arteocringe.seakingsstudios.com/descargar">
+<meta property="og:image" content="https://arteocringe.seakingsstudios.com/img/compartir.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="../icono.png">
+<link rel="apple-touch-icon" href="../icono.png">
+<link rel="manifest" href="../manifest.webmanifest">
+<script src="../config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Shrikhand&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --wall:#123c45; --wall-2:#1c5260; --wall-3:#0b2a31; --line:#2a6573;
+    --gold:#d9a93a; --gold-hi:#f3d27a; --gold-lo:#8a6418;
+    --ink:#f4efe4; --ink-dim:#a9c3c4; --cringe:#ff5d8f; --mint:#7fe3c8;
+    --gilt:linear-gradient(135deg,#f3d27a,#b98523 30%,#f6dc8c 50%,#9c6d1d 75%,#e9c060);
+    --r:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{min-height:100dvh;background:var(--wall) radial-gradient(110% 60% at 50% -10%,rgba(255,236,190,.16),transparent 62%) no-repeat;
+    color:var(--ink);font:400 17px/1.5 "Bricolage Grotesque",system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+  a{color:inherit}
+  button{font:inherit;color:inherit;cursor:pointer}
+  :focus-visible{outline:3px solid var(--mint);outline-offset:3px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+  h2{font-family:Shrikhand,serif;font-weight:400;font-size:clamp(26px,5vw,34px);line-height:1.12;margin-bottom:18px}
+
+  /* Portada */
+  .hero{display:grid;gap:36px;align-items:center;padding:max(36px,env(safe-area-inset-top)) 0 56px}
+  @media (min-width:880px){.hero{grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:56px;padding-top:64px}}
+  .logo{font-family:Shrikhand,serif;font-weight:400;line-height:1;font-size:clamp(52px,12vw,76px);text-align:center}
+  .logo .arte{display:inline-block;color:var(--gold-hi);padding:.04em .3em .14em;border:.09em solid transparent;border-image:var(--gilt) 1;
+    box-shadow:inset 0 0 0 2px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.35)}
+  .logo .o{display:block;font-size:.36em;color:var(--ink-dim);margin:.22em 0 .12em}
+  .logo .cringe{display:inline-block;background:var(--cringe);color:var(--wall-3);padding:.02em .3em .12em;border-radius:.12em;
+    transform:rotate(-5deg);box-shadow:.06em .07em 0 var(--wall-3)}
+  .tag{margin-top:26px;text-align:center;font-size:19px;color:var(--ink)}
+  .sub{margin-top:6px;text-align:center;color:var(--ink-dim);font-size:16px}
+  .ctas{margin-top:26px;display:flex;flex-direction:column;gap:12px}
+  .btn{display:flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:var(--r);padding:15px 20px;
+    font-size:18px;font-weight:800;text-decoration:none;text-align:center;transition:transform .08s}
+  .btn svg{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .btn.gold{background:linear-gradient(180deg,#f6d886,#d29a2c);color:#2a1a00;box-shadow:0 4px 0 var(--gold-lo)}
+  .btn.gold:active{transform:translateY(3px);box-shadow:0 1px 0 var(--gold-lo)}
+  .btn.ghost{background:transparent;border:2px solid var(--gold);color:var(--gold-hi)}
+  .btn.ghost.plain{border-color:var(--line);color:var(--ink)}
+  .btn[aria-disabled=true]{opacity:.55;pointer-events:none}
+  .btn small{display:block;font-size:13px;font-weight:600;opacity:.8}
+  .note{font-size:15px;color:var(--ink-dim);text-align:center}
+  .help{background:var(--wall-3);border:2px solid var(--line);border-radius:var(--r);padding:14px 16px;font-size:15px;color:var(--ink)}
+  .help b{color:var(--gold-hi)}
+  .ok{border-color:var(--mint)}
+  .warn{border-color:var(--gold);display:flex;flex-direction:column;gap:10px}
+  .warn p{color:var(--gold-hi);font-weight:600}
+
+  /* Ventana de PC con la captura */
+  .shot{position:relative}
+  .win{border-radius:12px;overflow:hidden;background:var(--wall-3);border:2px solid var(--line);box-shadow:0 26px 60px rgba(0,0,0,.5)}
+  .win-bar{display:flex;align-items:center;gap:8px;padding:9px 12px;background:#0e3139;border-bottom:2px solid var(--line);font-size:13px;color:var(--ink-dim);font-weight:600}
+  .win-bar img{width:16px;height:16px;border-radius:4px}
+  .win-bar .dots{margin-left:auto;display:flex;gap:14px;color:#6f9196;letter-spacing:.1em}
+  .win > img{display:block;width:100%;height:auto;aspect-ratio:1280/800}
+  @media (max-width:879px){.shot{display:none}}
+
+  /* Secciones */
+  section{padding:44px 0}
+  .steps{display:grid;gap:14px;counter-reset:paso}
+  @media (min-width:760px){.steps{grid-template-columns:repeat(3,1fr)}}
+  .step{background:var(--wall-2);border:2px solid var(--line);border-radius:var(--r);padding:18px;counter-increment:paso}
+  .step::before{content:counter(paso);display:grid;place-items:center;width:38px;height:38px;border-radius:50%;margin-bottom:10px;
+    font-family:Shrikhand,serif;font-size:20px;background:var(--cringe);color:var(--wall-3)}
+  .step h3{font-size:19px;margin-bottom:4px}
+  .step p{color:var(--ink-dim);font-size:16px}
+
+  .strip{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 16px 14px;margin:0 -16px;scrollbar-width:thin}
+  .strip img{flex:none;width:min(62vw,230px);height:auto;aspect-ratio:9/16;border-radius:16px;scroll-snap-align:center;
+    border:3px solid var(--wall-3);box-shadow:0 12px 28px rgba(0,0,0,.4)}
+  @media (min-width:1000px){.strip{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;overflow:visible;margin:0;padding:4px 0 14px}
+    .strip img{width:100%}.strip img:nth-child(n+5){display:none}}
+
+  .devices{display:grid;gap:14px}
+  @media (min-width:760px){.devices{grid-template-columns:repeat(3,1fr)}}
+  .dev{background:var(--wall-3);border:2px solid var(--line);border-radius:var(--r);padding:18px}
+  .dev h3{display:flex;align-items:center;gap:10px;font-size:19px;margin-bottom:6px}
+  .dev h3 svg{width:24px;height:24px;fill:none;stroke:var(--gold-hi);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .dev p{color:var(--ink-dim);font-size:16px}
+  .dev p + p{margin-top:8px}
+  .cross{margin-top:18px;text-align:center;font-size:17px}
+  .cross b{color:var(--mint)}
+
+  footer{padding:36px 0 calc(36px + env(safe-area-inset-bottom));border-top:1px solid var(--line);margin-top:20px;
+    display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:center;font-size:15px;color:var(--ink-dim)}
+  footer a{color:var(--ink-dim)}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div>
+      <h1 class="logo"><span class="arte">Arte</span><span class="o">o</span><span class="cringe">Cringe</span></h1>
+      <p class="tag">Un minuto para dibujar. Toda la sala para juzgarte.</p>
+      <p class="sub">Gratis, en español y para jugar con tus amigos desde la PC, el celular o el navegador.</p>
+
+      <div class="ctas">
+        <div class="help warn" id="inapp" hidden>
+          <p id="inapp-text"></p>
+          <a class="btn ghost" id="btn-chrome" href="#" hidden>Abrir en Chrome</a>
+        </div>
+        <a class="btn gold" href="../">
+          <svg viewBox="0 0 24 24"><path d="M7 4v16l13-8z"/></svg>Jugar ahora
+        </a>
+        <button class="btn ghost" id="btn-pc" type="button" hidden>
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/><path d="M12 7v5m-2.5-2.5L12 12l2.5-2.5"/></svg><span id="pc-text">Instalar en PC</span>
+        </button>
+        <a class="btn ghost plain" id="btn-android" href="#" target="_blank" rel="noopener" hidden>
+          <svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></svg>
+          <span id="android-text">Descargar para Android</span>
+        </a>
+        <p class="help" id="help" hidden></p>
+        <p class="note" id="note"></p>
+      </div>
+    </div>
+
+    <div class="shot">
+      <div class="win">
+        <div class="win-bar"><img src="../icono-192.png" alt="">Arte o Cringe<span class="dots" aria-hidden="true">—&nbsp;▢&nbsp;✕</span></div>
+        <img src="../img/pc-dibujo.webp" width="1280" height="800" alt="Arte o Cringe instalado en una PC: el lienzo a la izquierda y los colores a la derecha">
+      </div>
+    </div>
+  </header>
+
+  <section aria-labelledby="como">
+    <h2 id="como">Cómo se juega</h2>
+    <div class="steps">
+      <div class="step"><h3>Arma la sala</h3><p>Crea una sala y pasa el código de 4 letras. El tema sale al azar o lo escribe el anfitrión.</p></div>
+      <div class="step"><h3>Dibuja en un minuto</h3><p>Todos dibujan lo mismo al mismo tiempo. No importa si no sabes dibujar: es mejor.</p></div>
+      <div class="step"><h3>Arte o cringe</h3><p>Cada obra se califica del 1 al 5 sin saber de quién es. Al final se revela el autor… y empiezan las risas.</p></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="capturas">
+    <h2 id="capturas">Así se ve</h2>
+    <div class="strip">
+      <img src="../img/captura-1.webp" width="540" height="960" loading="lazy" alt="Un minuto para dibujar el tema">
+      <img src="../img/captura-2.webp" width="540" height="960" loading="lazy" alt="Toda la sala califica del 1 al 5">
+      <img src="../img/captura-3.webp" width="540" height="960" loading="lazy" alt="Al final se revela el autor">
+      <img src="../img/captura-4.webp" width="540" height="960" loading="lazy" alt="Obra maestra y Premio cringe">
+      <img src="../img/captura-5.webp" width="540" height="960" loading="lazy" alt="Sala con amigos y código para entrar">
+      <img src="../img/captura-6.webp" width="540" height="960" loading="lazy" alt="Mascotas, marcos y sonidos">
+    </div>
+  </section>
+
+  <section aria-labelledby="donde">
+    <h2 id="donde">Juega donde quieras</h2>
+    <div class="devices">
+      <div class="dev">
+        <h3><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>PC</h3>
+        <p>Instálalo desde Chrome o Edge: queda en tu escritorio y en el menú Inicio, abre en su propia ventana y se actualiza solo.</p>
+        <p>También funciona en Mac y Chromebook.</p>
+      </div>
+      <div class="dev">
+        <h3><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></svg>Android</h3>
+        <p id="dev-android">Abre esta página en Chrome desde tu celular y toca «Instalar en el celular»: queda con su ícono, como cualquier app. Muy pronto también en Google Play.</p>
+      </div>
+      <div class="dev">
+        <h3><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>iPhone y navegador</h3>
+        <p>Abre el juego en Safari o en cualquier navegador. En iPhone puedes tocar <b>Compartir → Agregar a inicio</b> para tenerlo como app.</p>
+      </div>
+    </div>
+    <p class="cross">Todos juegan juntos: <b>PC, celular y navegador entran a la misma sala</b> con el código.</p>
+  </section>
+
+  <footer>
+    <span>Hecho en México por SeaKingsGames</span>
+    <a href="../terminos.html">Términos de uso</a>
+    <a href="../privacidad.html">Aviso de privacidad</a>
+    <a href="mailto:seakingsgames@gmail.com">seakingsgames@gmail.com</a>
+  </footer>
+</div>
+
+<script>
+(() => {
+  const CFG = window.AOC_CONFIG || {};
+  const PLAY_URL = 'https://play.google.com/store/apps/details?id=com.seakingsgames.arteocringe';
+  const $ = (s) => document.querySelector(s);
+  const ua = navigator.userAgent || '';
+  const android = /Android/i.test(ua);
+  const ios = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const movil = android || ios || !!(navigator.userAgentData && navigator.userAgentData.mobile);
+  const firefox = /Firefox\//.test(ua);
+  const edge = /Edg\//.test(ua);
+  const safari = /Safari\//.test(ua) && !/Chrome|Chromium|CriOS|Edg|OPR|Firefox/.test(ua);
+  const instalada = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  let aviso = null;   // ventana de instalación que ofrece el navegador
+
+  // Navegadores dentro de TikTok, Instagram o Facebook: ahí no se puede instalar y los pagos pueden fallar.
+  const social = /musical_ly|BytedanceWebview|TikTok|trill_/i.test(ua) ? 'TikTok' : /Instagram/i.test(ua) ? 'Instagram' : /FBAN|FBAV|FB_IAB/i.test(ua) ? 'Facebook' : '';
+  const btnPc = $('#btn-pc'), help = $('#help'), note = $('#note'), btnAndroid = $('#btn-android');
+
+  const ayuda = () => {
+    if (android) return 'En Chrome: abre el menú <b>⋮</b> y toca <b>Instalar app</b> (o <b>Agregar a la pantalla principal</b>).';
+    if (firefox) return 'Firefox no instala juegos web. Abre esta página en <b>Chrome</b> o <b>Edge</b> para instalarlo, o juega directo con «Jugar ahora».';
+    if (safari) return 'En Safari de Mac: menú <b>Archivo → Agregar al Dock</b>.';
+    if (edge) return 'En Edge: menú <b>···</b> → <b>Aplicaciones</b> → <b>Instalar este sitio como una aplicación</b>.';
+    return 'En Chrome: toca el ícono de instalar al final de la barra de direcciones, o abre el menú <b>⋮</b> → <b>Transmitir, guardar y compartir</b> → <b>Instalar página como app</b>.';
+  };
+  const instalar = async () => {
+    if (aviso) {
+      aviso.prompt();
+      const r = await aviso.userChoice.catch(() => null);
+      if (r && r.outcome === 'accepted') aviso = null;
+      return;
+    }
+    help.innerHTML = ayuda();
+    help.hidden = false;
+  };
+
+  if (social) {
+    $('#inapp').hidden = false;
+    $('#inapp-text').innerHTML = `Estás en el navegador de ${social}. Para instalar el juego o pagar, ábrelo en ${ios ? 'Safari: toca <b>···</b> y luego <b>Abrir en el navegador</b>' : '<b>Chrome</b>'}.`;
+    if (android) {
+      const b = $('#btn-chrome');
+      b.href = `intent://${location.host}${location.pathname}${location.search}#Intent;scheme=https;package=com.android.chrome;end`;
+      b.hidden = false;
+    }
+    note.textContent = 'También puedes jugar aquí mismo con «Jugar ahora».';
+  } else if (instalada) {
+    note.textContent = 'Ya estás en la app instalada.';
+  } else if (ios) {
+    note.innerHTML = 'En iPhone: abre el juego en Safari, toca <b>Compartir</b> y luego <b>Agregar a inicio</b>.';
+  } else if (android && CFG.PLAY_PUBLICO) {
+    btnAndroid.hidden = false; btnAndroid.href = PLAY_URL;
+    note.textContent = 'Gratis en Google Play.';
+  } else {
+    // PC, o Android mientras la app no esté en Google Play: se instala desde aquí.
+    btnPc.hidden = false;
+    $('#pc-text').textContent = android ? 'Instalar en el celular' : 'Instalar en PC';
+    btnPc.onclick = instalar;
+    note.textContent = 'Pesa casi nada y no pide permisos. Si un día lo quieres quitar, se desinstala como cualquier app.';
+    if (!android) {
+      btnAndroid.hidden = false;
+      if (CFG.PLAY_PUBLICO) btnAndroid.href = PLAY_URL;
+      else {
+        btnAndroid.setAttribute('aria-disabled', 'true'); btnAndroid.removeAttribute('href');
+        $('#android-text').innerHTML = 'Android<small>Abre esta página en tu celular para instalarlo</small>';
+      }
+    }
+  }
+  if (CFG.PLAY_PUBLICO) $('#dev-android').textContent = 'Descárgalo gratis en Google Play. Ahí también puedes comprar paquetes y mascotas.';
+
+  addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); aviso = e; help.hidden = true; });
+  addEventListener('appinstalled', () => {
+    aviso = null;
+    help.className = 'help ok';
+    help.innerHTML = android ? '<b>¡Listo!</b> Ya está en tu pantalla de inicio como «Arte o Cringe».' : '<b>¡Listo!</b> Búscalo como «Arte o Cringe» en tu escritorio o en el menú Inicio.';
+    help.hidden = false;
+  });
+
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    addEventListener('load', () => { try { navigator.serviceWorker.register('../sw.js', { scope: '../' }).catch(() => {}); } catch {} });
+  }
+})();
+</script>
+</body>
+</html>
