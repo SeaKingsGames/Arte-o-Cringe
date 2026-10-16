@@ -1,0 +1,27 @@
+{
+  "id": "/",
+  "name": "Arte o Cringe",
+  "short_name": "Arte o Cringe",
+  "description": "Dibuja en un minuto y deja que tus amigos decidan: ¿es arte o es cringe?",
+  "lang": "es-MX",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#123c45",
+  "theme_color": "#123c45",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    { "src": "icono-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icono.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icono-mascara.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "screenshots": [
+    { "src": "img/pc-dibujo.webp", "sizes": "1280x800", "type": "image/webp", "form_factor": "wide", "label": "Dibuja el tema en un minuto" },
+    { "src": "img/pc-inicio.webp", "sizes": "1280x800", "type": "image/webp", "form_factor": "wide", "label": "Crea una sala y comparte el código" },
+    { "src": "img/captura-1.webp", "sizes": "540x960", "type": "image/webp", "form_factor": "narrow", "label": "Un minuto para dibujar" },
+    { "src": "img/captura-2.webp", "sizes": "540x960", "type": "image/webp", "form_factor": "narrow", "label": "Toda la sala califica" },
+    { "src": "img/captura-3.webp", "sizes": "540x960", "type": "image/webp", "form_factor": "narrow", "label": "Al final se revela el autor" }
+  ]
+}
