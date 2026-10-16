@@ -23,7 +23,7 @@ window.AOC_CONFIG = {
 
   // Cobros en la web con Mercado Pago. Ponlo en true cuando la función "pagos"
   // de Supabase ya tenga tu MP_ACCESS_TOKEN (ver la guía).
-  MERCADOPAGO: false,
+  MERCADOPAGO: true,
 
   // Anuncios en la web con AdSense. ADSENSE_CLIENT es tu ca-pub-… (AdSense → Cuenta).
   // ADSENSE_BANNER es el número de un bloque de anuncios de display (opcional).
