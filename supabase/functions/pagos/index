@@ -1,0 +1,156 @@
+// Función "pagos" de Arte o Cringe: compras en la versión web con Mercado Pago.
+//
+// Cómo se instala (una sola vez):
+//   Supabase → Edge Functions → Deploy a new function → Via Editor → nombre: pagos
+//   Pega este archivo completo y dale Deploy. Luego, en los detalles de la función,
+//   APAGA "Enforce JWT verification" (Mercado Pago no manda sesión; aquí se revisa a mano).
+//   Edge Functions → Secrets → agrega MP_ACCESS_TOKEN con tu Access Token de producción
+//   de Mercado Pago (empieza con APP_USR-).
+//
+// Rutas (todas POST con JSON):
+//   /pagos/crear      { producto, volver }  → { url }   abre el pago (pide la sesión del juego)
+//   /pagos/confirmar  { pago }              → estado    al regresar de Mercado Pago (pide sesión)
+//   /pagos/recuperar  { pago, correo }      → estado    pasa una compra a esta cuenta si el correo coincide
+//   /pagos/webhook                          ← avisos de Mercado Pago
+//
+// Nunca se entrega nada sin preguntarle antes a Mercado Pago por ese pago.
+import { createClient } from 'npm:@supabase/supabase-js@2.45.4';
+
+const SB_URL = Deno.env.get('SUPABASE_URL') ?? '';
+const SB_LLAVE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? Deno.env.get('LLAVE_SECRETA') ?? '';
+const MP_TOKEN = Deno.env.get('MP_ACCESS_TOKEN') ?? '';
+const MP_API = 'https://api.mercadopago.com';
+
+const db = createClient(SB_URL, SB_LLAVE, { auth: { persistSession: false, autoRefreshToken: false } });
+
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
+const responder = (cuerpo: unknown, status = 200) =>
+  new Response(JSON.stringify(cuerpo), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
+
+async function usuarioDe(req: Request) {
+  const token = (req.headers.get('Authorization') ?? '').replace(/^Bearer\s+/i, '');
+  if (!token) return null;
+  const { data, error } = await db.auth.getUser(token);
+  return error || !data?.user ? null : data.user;
+}
+
+async function mp(ruta: string, init: RequestInit = {}) {
+  const r = await fetch(MP_API + ruta, {
+    ...init,
+    headers: { Authorization: `Bearer ${MP_TOKEN}`, 'Content-Type': 'application/json', ...(init.headers ?? {}) },
+  });
+  const datos = await r.json().catch(() => ({}));
+  return { ok: r.ok, status: r.status, datos };
+}
+
+// Lee el pago en Mercado Pago y lo registra en la base. external_reference = "usuario|producto".
+async function procesarPago(id: string, opciones: { soloDe?: string; reasignarA?: string; correo?: string } = {}) {
+  if (!/^\d{1,20}$/.test(id)) return { status: 400, cuerpo: { error: 'Número de pago inválido' } };
+  const r = await mp(`/v1/payments/${id}`);
+  if (r.status === 404) return { status: 404, cuerpo: { error: 'Ese pago no existe' } };
+  if (!r.ok) { console.error('mp pago', r.status, r.datos); return { status: 502, cuerpo: { error: 'Mercado Pago no respondió' } }; }
+  const p = r.datos;
+  const [usuario, producto] = String(p.external_reference ?? '').split('|');
+  if (!usuario || !producto) return { status: 200, cuerpo: { ignorado: true } };   // no es un pago del juego
+  if (opciones.soloDe && usuario !== opciones.soloDe) return { status: 403, cuerpo: { error: 'Ese pago es de otra cuenta' } };
+
+  if (opciones.reasignarA) {
+    const correoPago = String(p.payer?.email ?? '').trim().toLowerCase();
+    if (!correoPago || correoPago !== String(opciones.correo ?? '').trim().toLowerCase()) {
+      return { status: 403, cuerpo: { error: 'El correo no coincide con el del pago' } };
+    }
+    // Asegura que el pago exista en la base antes de moverlo.
+    const reg = await db.rpc('registrar_pago_web', {
+      p_id: String(p.id), p_usuario: usuario, p_producto: producto, p_estado: p.status, p_monto: p.transaction_amount, p_moneda: p.currency_id,
+    });
+    if (reg.error) { console.error('registrar', reg.error); return { status: 500, cuerpo: { error: 'No se pudo guardar' } }; }
+    const { data, error } = await db.rpc('reasignar_pago_web', { p_id: String(p.id), p_usuario: opciones.reasignarA });
+    if (error) { console.error('reasignar', error); return { status: 500, cuerpo: { error: 'No se pudo recuperar' } }; }
+    return { status: 200, cuerpo: data };
+  }
+
+  const { data, error } = await db.rpc('registrar_pago_web', {
+    p_id: String(p.id), p_usuario: usuario, p_producto: producto, p_estado: p.status, p_monto: p.transaction_amount, p_moneda: p.currency_id,
+  });
+  if (error) {
+    console.error('registrar', error);
+    // Un producto que ya no existe no se va a arreglar reintentando.
+    return { status: /desconocido/.test(error.message) ? 200 : 500, cuerpo: { error: 'No se pudo guardar el pago' } };
+  }
+  return { status: 200, cuerpo: data };
+}
+
+async function crear(req: Request) {
+  const u = await usuarioDe(req);
+  if (!u) return responder({ error: 'Sin sesión' }, 401);
+  const { producto, volver } = await req.json().catch(() => ({}));
+  const { data: p } = await db.from('precios_web').select('id, nombre, mxn, activo').eq('id', String(producto ?? '')).maybeSingle();
+  if (!p || !p.activo) return responder({ error: 'Ese artículo no está a la venta' }, 400);
+  const { data: perfil } = await db.from('perfiles').select('compras').eq('id', u.id).maybeSingle();
+  if (perfil?.compras?.includes(p.id)) return responder({ error: 'Ya es tuyo' }, 409);
+
+  let base = '';
+  try {
+    const v = new URL(String(volver ?? ''));
+    if (v.protocol === 'https:' || v.hostname === 'localhost') base = v.origin + v.pathname;
+  } catch { /* sin página de regreso */ }
+
+  const preferencia: Record<string, unknown> = {
+    items: [{ id: p.id, title: `Arte o Cringe: ${p.nombre}`, quantity: 1, unit_price: Number(p.mxn), currency_id: 'MXN', category_id: 'games' }],
+    external_reference: `${u.id}|${p.id}`,
+    notification_url: `${SB_URL}/functions/v1/pagos/webhook`,
+    statement_descriptor: 'SEAKINGSGAMES',
+  };
+  if (base) {
+    preferencia.back_urls = { success: `${base}?pago=ok`, pending: `${base}?pago=pendiente`, failure: `${base}?pago=error` };
+    preferencia.auto_return = 'approved';
+  }
+  const r = await mp('/checkout/preferences', {
+    method: 'POST', body: JSON.stringify(preferencia), headers: { 'X-Idempotency-Key': crypto.randomUUID() },
+  });
+  if (!r.ok || !r.datos.init_point) { console.error('mp preferencia', r.status, r.datos); return responder({ error: 'Mercado Pago no respondió' }, 502); }
+  return responder({ url: r.datos.init_point });
+}
+
+async function confirmar(req: Request, recuperar = false) {
+  const u = await usuarioDe(req);
+  if (!u) return responder({ error: 'Sin sesión' }, 401);
+  const { pago, correo } = await req.json().catch(() => ({}));
+  const res = recuperar
+    ? await procesarPago(String(pago ?? '').trim(), { reasignarA: u.id, correo })
+    : await procesarPago(String(pago ?? '').trim(), { soloDe: u.id });
+  return responder(res.cuerpo, res.status);
+}
+
+// Mercado Pago avisa con ?data.id=123&type=payment (o ?id=123&topic=payment) y un JSON con data.id.
+async function webhook(req: Request) {
+  const q = new URL(req.url).searchParams;
+  const cuerpo = await req.json().catch(() => ({}));
+  const tipo = q.get('type') ?? q.get('topic') ?? cuerpo.type ?? cuerpo.topic ?? '';
+  const id = String(q.get('data.id') ?? cuerpo?.data?.id ?? (tipo === 'payment' ? q.get('id') : '') ?? '');
+  if (tipo !== 'payment' || !id) return responder({ ok: true });   // otros avisos no nos importan
+  const res = await procesarPago(id);
+  // 500 hace que Mercado Pago lo vuelva a intentar más tarde; lo demás se da por recibido.
+  return responder(res.cuerpo, res.status >= 500 ? 500 : 200);
+}
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
+  if (req.method !== 'POST') return responder({ error: 'Usa POST' }, 405);
+  if (!MP_TOKEN || !SB_LLAVE) return responder({ error: 'Falta configurar MP_ACCESS_TOKEN en Secrets' }, 500);
+  const ruta = new URL(req.url).pathname.split('/').filter(Boolean).pop();
+  try {
+    if (ruta === 'crear') return await crear(req);
+    if (ruta === 'confirmar') return await confirmar(req);
+    if (ruta === 'recuperar') return await confirmar(req, true);
+    if (ruta === 'webhook') return await webhook(req);
+    return responder({ error: 'Ruta desconocida' }, 404);
+  } catch (e) {
+    console.error('pagos', e);
+    return responder({ error: 'Error interno' }, 500);
+  }
+});
