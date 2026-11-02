@@ -269,16 +269,27 @@ grant execute on function public.ranking(text) to authenticated;
 -- =====================================================================
 -- BORRAR MIS DATOS (lo pide Google Play)
 -- El jugador puede borrar su cuenta desde el juego: inicio → "Borrar mis datos".
--- Al borrar la cuenta se borran en cascada su perfil, monedas, compras,
--- puntos del ranking y rondas cobradas. Los reportes y suspensiones se
--- conservan el tiempo que dice el aviso de privacidad, para moderación.
+-- Se borran su perfil, monedas, compras, pagos web, puntos del ranking, rondas
+-- cobradas y salas públicas. Los reportes y suspensiones se conservan el tiempo
+-- que dice el aviso de privacidad, para moderación.
+-- La cuenta es de SeaKingsGames: este proyecto también lo usa Pañalazo (tablas
+-- panalazo_*). Si la misma cuenta tiene datos en Pañalazo, la cuenta y el correo
+-- se quedan para ese juego; si no, se borra la cuenta completa.
 -- =====================================================================
 create or replace function public.borrar_mis_datos()
 returns void
 language plpgsql security definer set search_path = '' as $$
+declare u uuid := auth.uid(); otro_juego boolean := false;
 begin
-  if auth.uid() is null then return; end if;
-  delete from auth.users where id = auth.uid();
+  if u is null then return; end if;
+  delete from public.salas_publicas where anfitrion = u;
+  delete from public.rondas_cobradas where usuario = u;
+  delete from public.pagos_web where usuario = u;
+  delete from public.perfiles where id = u;
+  if to_regclass('public.panalazo_jugadores') is not null then
+    execute 'select exists (select 1 from public.panalazo_jugadores where id = $1)' into otro_juego using u;
+  end if;
+  if not otro_juego then delete from auth.users where id = u; end if;
 end $$;
 revoke all on function public.borrar_mis_datos() from public, anon;
 grant execute on function public.borrar_mis_datos() to authenticated;
