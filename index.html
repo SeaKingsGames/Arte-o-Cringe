@@ -20,7 +20,7 @@
 <title>Arte o Cringe</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Bungee&family=Chewy&family=Creepster&family=Emilys+Candy&family=Great+Vibes&family=Orbitron:wght@700&family=Press+Start+2P&family=Rye&family=Shrikhand&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Bungee&family=Chewy&family=Creepster&family=Great+Vibes&family=Luckiest+Guy&family=Orbitron:wght@700&family=Press+Start+2P&family=Rye&family=Shrikhand&display=swap" rel="stylesheet">
 <style>
   :root{
     color-scheme:dark;
@@ -443,7 +443,7 @@
   .live-qr img{width:100%;height:100%;image-rendering:pixelated;display:block}
   .live-txt{display:flex;flex-direction:column;gap:2px;min-width:0;font-size:15px;font-weight:600}
   .live-big{font-family:Shrikhand,serif;font-weight:400;font-size:24px;line-height:1.1;color:#c2185b}
-  .live-url{font-size:17px;font-weight:800;word-break:break-all}
+  .live-url{font-size:16px;font-weight:800;overflow-wrap:anywhere}
   .live-code{font-family:Shrikhand,serif;font-weight:400;font-size:22px;letter-spacing:.08em;color:#8a6418}
   .live-vote{margin-top:4px;font-size:13px;color:#5b5750}
   .live-set{display:flex;flex-direction:column;gap:6px;margin-top:8px}
@@ -505,12 +505,46 @@
   @media (prefers-reduced-motion:reduce){.tel-card{animation:none}}
 
   /* Paquetes nuevos: marcos */
-  .frame.f-cempasuchil{background:radial-gradient(circle at 38% 38%,#ffb703 0 3px,transparent 3.5px) 0 0/16px 16px,radial-gradient(circle,#fb8500 0 6px,transparent 6.5px) 0 0/16px 16px,#5a189a;
-    box-shadow:inset 0 0 0 3px #3c096c,inset 0 0 0 7px rgba(255,183,3,.3),0 16px 36px rgba(0,0,0,.5)}
+  .frame.f-leopardo{background:radial-gradient(ellipse 7px 6px at 50% 50%,#c98a2b 0 3px,#3d2b1f 3.5px 6.5px,transparent 7px) 0 0/23px 19px,
+    radial-gradient(ellipse 6px 7px at 50% 50%,#c98a2b 0 2.5px,#3d2b1f 3px 5.5px,transparent 6px) 10px 11px/31px 27px,
+    radial-gradient(circle,#3d2b1f 0 2px,transparent 2.5px) 16px 3px/17px 23px,#e9b44c;
+    box-shadow:inset 0 0 0 3px #3d2b1f,inset 0 0 0 7px rgba(255,240,200,.25),0 16px 36px rgba(0,0,0,.5)}
   .frame.f-corazones{background:radial-gradient(circle,#ffccd5 0 2.5px,transparent 3.5px) 0 0/14px 14px,linear-gradient(135deg,#c9184a,#ff4d6d 50%,#a4133c);
     box-shadow:inset 0 0 0 2px #590d22,inset 0 0 0 6px rgba(255,215,0,.5),0 16px 36px rgba(0,0,0,.5)}
   .frame.f-pixel{background:conic-gradient(#3a0ca3 25%,#4cc9f0 0 50%,#3a0ca3 0 75%,#4cc9f0 0) 0 0/16px 16px;box-shadow:inset 0 0 0 3px #10002b,0 16px 36px rgba(0,0,0,.5)}
   .pill.nuevo{color:#fff;background:var(--cringe)}
+
+  /* Modos de juego en tarjetas; lo demás en "Ajustes de la sala" */
+  .modos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:8px}
+  .modo{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;border:2px solid var(--line);background:var(--wall-2);
+    border-radius:16px;padding:12px 12px 13px;color:var(--ink);font:inherit;min-height:112px}
+  .modo .modo-ico{font-size:26px;line-height:1.1;margin-bottom:2px}
+  .modo b{font-size:16px;font-weight:800;line-height:1.2}
+  .modo .modo-txt{font-size:13px;line-height:1.3;color:var(--ink-dim)}
+  .modo .pill{margin-top:4px}
+  .modo.on{border-color:var(--gold-hi);background:var(--wall-3);box-shadow:0 0 0 2px rgba(243,210,122,.25)}
+  .modo.on b{color:var(--gold-hi)}
+  .modo-actual{display:flex;align-items:center;gap:12px;background:var(--wall-2);border:2px solid var(--gold-hi);border-radius:16px;padding:12px 14px}
+  .modo-actual .modo-ico{font-size:30px;line-height:1}
+  .modo-actual .modo-cuerpo{display:flex;flex-direction:column;gap:2px}
+  .modo-actual b{font-size:17px;font-weight:800;color:var(--gold-hi)}
+  .modo-actual .modo-txt{font-size:14px;color:var(--ink-dim)}
+  #hs-prompt-box{margin-top:10px}
+  #hs-prompt-box input{font-size:17px;padding:12px 14px}
+  .hs-resumen{display:flex;flex-direction:column;gap:8px;margin-top:12px;background:var(--wall-3);border-radius:14px;padding:12px 14px}
+  .hs-resumen p{font-size:14px;font-weight:600;color:var(--ink-dim);line-height:1.4}
+  #btn-ajustes{display:flex;align-items:center;justify-content:center;gap:8px;align-self:stretch}
+  #btn-ajustes svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .sheet.ajustes{gap:16px}
+  .aj-sec{display:flex;flex-direction:column;gap:2px}
+  .aj-sec .sec{margin:0 0 2px}
+  .ajustes .seg{background:var(--wall-3)}
+  .ajustes .seg button[aria-pressed=true]{background:var(--wall)}
+  .ajustes .chip{background:var(--wall)}
+  .ajustes .chip.on{background:var(--wall-3)}
+  .aj-pie{position:sticky;bottom:calc(-18px - var(--safe-area-inset-bottom,env(safe-area-inset-bottom,0px)));margin:0 -16px calc(-18px - var(--safe-area-inset-bottom,env(safe-area-inset-bottom,0px)));
+    padding:12px 16px calc(18px + var(--safe-area-inset-bottom,env(safe-area-inset-bottom,0px)));background:var(--wall-2);box-shadow:0 -10px 18px rgba(5,20,24,.35)}
+  .aj-pie .btn{width:100%}
 </style>
 </head>
 <body>
@@ -579,6 +613,7 @@
     </div>
     <ul class="players" id="lobby-players"></ul>
     <div id="slot-lobby"></div>
+    <div class="modo-actual guest-only" id="guest-modo"></div>
     <p class="hint left guest-only" id="guest-set"></p>
     <div>
       <div class="sec-row"><h3 class="sec">Tu estilo</h3><button class="btn text small" data-shop="estilo">Cambiar</button></div>
@@ -722,41 +757,64 @@
 
 <div hidden>
   <div class="host-set" id="host-set">
-    <div class="sec-row"><h3 class="sec">Sala</h3></div>
-    <div class="seg" id="hs-pub">
-      <button data-pub="0" aria-pressed="true">Privada</button>
-      <button data-pub="1" aria-pressed="false">Pública</button>
-    </div>
-    <p class="hint left hs-note" id="hs-pub-note"></p>
-    <div class="sec-row"><h3 class="sec">Máximo de jugadores</h3></div>
-    <div class="chips" id="hs-max"></div>
     <div class="sec-row"><h3 class="sec">Modo de juego</h3></div>
-    <div class="chips" id="hs-juego"></div>
-    <p class="hint left hs-note" id="hs-juego-desc"></p>
-    <div class="sec-row"><h3 class="sec" id="hs-tema-title">Tema de la ronda</h3></div>
-    <div class="seg" id="hs-mode">
-      <button data-mode="azar" aria-pressed="true">Al azar</button>
-      <button data-mode="propio" aria-pressed="false">Lo escribo yo</button>
-    </div>
-    <input id="hs-prompt" maxlength="60" autocomplete="off" placeholder="Ej. Un pez con bigote" aria-label="Tema que van a dibujar" hidden>
-    <div class="chips" id="lobby-packs"></div>
-    <p class="hint left hs-note" id="hs-tema-note" hidden></p>
-    <div class="sec-row"><h3 class="sec">Tiempo para dibujar</h3></div>
-    <div class="chips" id="hs-time"></div>
-    <div class="sec-row"><h3 class="sec">Modo Live (TikTok)</h3></div>
-    <div class="seg" id="hs-live">
-      <button data-live="0" aria-pressed="true">Apagado</button>
-      <button data-live="1" aria-pressed="false">Encendido</button>
-    </div>
-    <div class="live-set" id="hs-live-box" hidden>
-      <label class="field"><span>Tu usuario de TikTok</span>
-        <input id="hs-live-user" maxlength="25" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="litoelajolote">
-      </label>
-      <p class="hint left hs-note" id="hs-live-status"></p>
+    <div class="modos" id="hs-juego"></div>
+    <label class="field" id="hs-prompt-box" hidden><span>Tema que van a dibujar</span>
+      <input id="hs-prompt" maxlength="60" autocomplete="off" placeholder="Ej. Un pez con bigote">
+    </label>
+    <div class="hs-resumen">
+      <p id="hs-resumen"></p>
+      <button class="btn ghost small" id="btn-ajustes"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Ajustes de la sala</button>
     </div>
   </div>
 </div>
 
+<div class="sheet-wrap" id="ajustes" hidden>
+  <div class="sheet-bg" data-ajustes-cerrar></div>
+  <div class="sheet ajustes" role="dialog" aria-modal="true" aria-labelledby="ajustes-title" tabindex="-1">
+    <h3 id="ajustes-title">Ajustes de la sala</h3>
+    <section class="aj-sec">
+      <h4 class="sec">Quién puede entrar</h4>
+      <div class="seg" id="hs-pub">
+        <button data-pub="0" aria-pressed="true">Privada</button>
+        <button data-pub="1" aria-pressed="false">Pública</button>
+      </div>
+      <p class="hint left hs-note" id="hs-pub-note"></p>
+    </section>
+    <section class="aj-sec">
+      <h4 class="sec">Máximo de jugadores</h4>
+      <div class="chips" id="hs-max"></div>
+      <p class="hint left hs-note">Si la sala se llena, la ronda empieza sola.</p>
+    </section>
+    <section class="aj-sec">
+      <h4 class="sec" id="hs-tema-title">Temas</h4>
+      <div class="seg" id="hs-mode">
+        <button data-mode="azar" aria-pressed="true">Al azar</button>
+        <button data-mode="propio" aria-pressed="false">Lo escribo yo</button>
+      </div>
+      <div class="chips" id="lobby-packs"></div>
+      <p class="hint left hs-note" id="hs-tema-note" hidden></p>
+    </section>
+    <section class="aj-sec">
+      <h4 class="sec">Tiempo para dibujar</h4>
+      <div class="chips" id="hs-time"></div>
+    </section>
+    <section class="aj-sec">
+      <h4 class="sec">Modo Live (TikTok)</h4>
+      <div class="seg" id="hs-live">
+        <button data-live="0" aria-pressed="true">Apagado</button>
+        <button data-live="1" aria-pressed="false">Encendido</button>
+      </div>
+      <div class="live-set" id="hs-live-box" hidden>
+        <label class="field"><span>Tu usuario de TikTok</span>
+          <input id="hs-live-user" maxlength="25" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="litoelajolote">
+        </label>
+        <p class="hint left hs-note" id="hs-live-status"></p>
+      </div>
+    </section>
+    <div class="aj-pie"><button class="btn gold" id="btn-ajustes-listo" data-ajustes-cerrar>Listo</button></div>
+  </div>
+</div>
 <div class="sheet-wrap" id="sheet" hidden>
   <div class="sheet-bg" data-close></div>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" tabindex="-1">
@@ -838,10 +896,10 @@ const DRAW_TIMES = [30, 60, 120, 180];
 const MAX_OPCIONES = [4, 6, 8, 10, 12];
 // Modos de juego. "listo: false" los esconde mientras se terminan.
 const JUEGOS = {
-  clasico: { name: 'Clásico', icon: '🎨', desc: 'Todos dibujan el mismo tema y la sala califica cada obra del 1 al 5.' },
-  relampago: { name: 'Relámpago', icon: '⚡', draw: 15, vote: 10, reveal: 3000, desc: '15 segundos para dibujar y votación rápida. Puro caos.' },
-  impostor: { name: 'Impostor', icon: '🕵️', min: 3, desc: 'A uno le toca un tema parecido pero distinto, y ni él lo sabe. Al final, adivinen quién era.' },
-  telefono: { name: 'Teléfono descompuesto', icon: '📞', desc: 'Dibuja, adivina lo que dibujó otro, dibuja esa respuesta… y vean cómo se descompone.' },
+  clasico: { name: 'Clásico', icon: '🎨', corto: 'Dibujen el mismo tema y califiquen del 1 al 5', desc: 'Todos dibujan el mismo tema y la sala califica cada obra del 1 al 5.' },
+  relampago: { name: 'Relámpago', icon: '⚡', corto: '15 segundos para dibujar', draw: 15, vote: 10, reveal: 3000, desc: '15 segundos para dibujar y votación rápida. Puro caos.' },
+  impostor: { name: 'Impostor', icon: '🕵️', corto: 'Uno tiene otro tema. ¿Quién es?', min: 3, desc: 'A uno le toca un tema parecido pero distinto, y ni él lo sabe. Al final, adivinen quién era.' },
+  telefono: { name: 'Teléfono descompuesto', icon: '📞', corto: 'Dibuja, adivina y mira cómo se descompone', desc: 'Dibuja, adivina lo que dibujó otro, dibuja esa respuesta… y vean cómo se descompone.' },
 };
 
 /* ---------- catálogo ---------- */
@@ -913,14 +971,14 @@ const PIECES = [
     'Una bola disco con sentimientos', 'Un discurso que salió muy mal', 'Un payaso que llegó a la fiesta equivocada',
     'Un sonidero en el espacio', 'Un regalo que nadie quiere abrir', 'La conga más larga del mundo',
     'Una gelatina bailando', 'Un vecino quejándose de la fiesta', 'Un pulpo de DJ', 'Un gato en su fiesta sorpresa'] },
-  { id: 'tema_muertos', type: 'tema', name: 'Día de Muertos', icon: '💀', prompts: [
-    'Una calaverita haciendo fila para el pan de muerto', 'La Catrina en el tianguis', 'Un esqueleto bailando con su abuelita',
-    'Un perro xolo cuidando la ofrenda', 'Un fantasma oliendo el mole de la ofrenda', 'Un altar con WiFi',
-    'Una calaverita de azúcar con caries', 'El cempasúchil más grande del mundo', 'Un difunto que no encuentra su casa',
-    'Un esqueleto mariachi', 'Una ofrenda para tu mascota', 'La Muerte en patines',
-    'Un alebrije con hipo', 'Un panteón de fiesta', 'Un pan de muerto con superpoderes',
-    'Un esqueleto tomándose una selfie', 'La abuela regañando a la Catrina', 'Una vela que no quiere apagarse',
-    'Un esqueleto perdido en el Metro', 'Un alebrije de mascota', 'El papel picado volando con el viento', 'Una Catrina en el gimnasio'] },
+  { id: 'tema_animales', type: 'tema', name: 'Animales', icon: '🐾', prompts: [
+    'Un perro en su primer día de trabajo', 'Un gato pagando la renta', 'Una jirafa en un elevador',
+    'Un pingüino que odia el frío', 'Un elefante en una tienda de cristales', 'Un mapache en el súper a las 3 a.m.',
+    'Una vaca haciendo yoga', 'Un pulpo de mesero', 'Un león con miedo a los ratones',
+    'Una tortuga que llega tarde a todo', 'Un burro dando clases', 'Un perico chismoso',
+    'Un oso que no quiere invernar', 'Una gallina en la playa', 'Un cocodrilo en el dentista',
+    'Un flamingo con dolor de pierna', 'Un caracol en una carrera', 'Un pez que quiere volar',
+    'Una hormiga cargando un elote', 'Un perezoso en una entrevista de trabajo', 'Un camello sin agua', 'Un gato juez de un concurso de baile'] },
   { id: 'tema_telenovela', type: 'tema', name: 'Telenovela', icon: '🌹', prompts: [
     'La villana descubriendo que la heroína es su hermana', 'Una cachetada en cámara lenta', 'El galán con amnesia',
     'Un gemelo malvado con bigote', 'La boda interrumpida', 'Una suegra escuchando detrás de la puerta',
@@ -938,7 +996,7 @@ const PIECES = [
     'Un trofeo imposible', 'Un mago sin maná', 'Alguien dando consejos en el chat de un stream',
     'Una carrera de karts con cáscaras de plátano', 'Un robot que perdió contra un niño', 'Un pixel que se salió de la pantalla', 'Un héroe que olvidó guardar la partida'] },
   { id: 'marco_dorado', type: 'marco', name: 'Dorado clásico', free: true },
-  { id: 'marco_cempasuchil', type: 'marco', name: 'Cempasúchil' },
+  { id: 'marco_leopardo', type: 'marco', name: 'Animal print' },
   { id: 'marco_corazones', type: 'marco', name: 'Corazones' },
   { id: 'marco_pixel', type: 'marco', name: 'Pixel' },
   { id: 'marco_carton', type: 'marco', name: 'Cartón y cinta', free: true },
@@ -953,7 +1011,7 @@ const PIECES = [
   { id: 'fondo_pantalla', type: 'fondo', name: 'Pantalla' },
   { id: 'fondo_xochimilco', type: 'fondo', name: 'Xochimilco' },
   { id: 'fondo_antro', type: 'fondo', name: 'Antro' },
-  { id: 'fondo_altar', type: 'fondo', name: 'Altar' },
+  { id: 'fondo_selva', type: 'fondo', name: 'Selva' },
   { id: 'fondo_telon', type: 'fondo', name: 'Telón rojo' },
   { id: 'fondo_arcade', type: 'fondo', name: 'Arcade' },
   { id: 'letra_normal', type: 'letra', name: 'Normal', free: true, font: "'Bricolage Grotesque'" },
@@ -962,7 +1020,7 @@ const PIECES = [
   { id: 'letra_pixel', type: 'letra', name: 'Pixel', font: "'Press Start 2P'", small: true },
   { id: 'letra_chewy', type: 'letra', name: 'Chicle', font: "'Chewy'" },
   { id: 'letra_bungee', type: 'letra', name: 'Marquesina', font: "'Bungee'" },
-  { id: 'letra_azucar', type: 'letra', name: 'Azúcar', font: "'Emilys Candy'" },
+  { id: 'letra_selva', type: 'letra', name: 'Caricatura', font: "'Luckiest Guy'" },
   { id: 'letra_romantica', type: 'letra', name: 'Romántica', font: "'Great Vibes'" },
   { id: 'letra_futuro', type: 'letra', name: 'Futuro', font: "'Orbitron'", small: true },
   { id: 'entrada_fanfarria', type: 'entrada', name: 'Fanfarria', free: true },
@@ -972,7 +1030,7 @@ const PIECES = [
   { id: 'entrada_bocina', type: 'entrada', name: 'Bocina de estadio' },
   { id: 'entrada_coro', type: 'entrada', name: 'Coro celestial' },
   { id: 'entrada_redoble', type: 'entrada', name: 'Redoble' },
-  { id: 'entrada_difuntos', type: 'entrada', name: 'Son de difuntos' },
+  { id: 'entrada_rugido', type: 'entrada', name: 'Rugido' },
   { id: 'entrada_drama', type: 'entrada', name: '¡Drama!' },
   { id: 'entrada_nivel', type: 'entrada', name: 'Nivel superado' },
   { id: 'reaccion_clasica', type: 'reaccion', name: 'Clásicas', free: true },
@@ -981,7 +1039,7 @@ const PIECES = [
   { id: 'reaccion_retro', type: 'reaccion', name: '8 bits' },
   { id: 'reaccion_caricatura', type: 'reaccion', name: 'Caricatura' },
   { id: 'reaccion_fiesta', type: 'reaccion', name: 'Fiesta' },
-  { id: 'reaccion_huesitos', type: 'reaccion', name: 'Huesitos' },
+  { id: 'reaccion_animales', type: 'reaccion', name: 'Granja' },
   { id: 'reaccion_suspiros', type: 'reaccion', name: 'Suspiros' },
   { id: 'reaccion_arcade', type: 'reaccion', name: 'Arcade' },
   { id: 'stickers_basicos', type: 'stickers', name: 'Básicos', free: true, set: ['😂', '🔥', '💀', '👏', '🤮'] },
@@ -990,7 +1048,7 @@ const PIECES = [
   { id: 'stickers_internet', type: 'stickers', name: 'Internet', set: ['🤡', '💯', 'XD', 'GG', 'F'] },
   { id: 'stickers_ajolote', type: 'stickers', name: 'Ajolotes', set: ['💕', '🫧', '¡AJÚA!', 'AJOLOVE', '🌊'] },
   { id: 'stickers_fiesta', type: 'stickers', name: 'Fiesta', set: ['🎉', '🥳', '🪩', '¡OTRA!', '¡ESO!'] },
-  { id: 'stickers_muertos', type: 'stickers', name: 'Día de Muertos', set: ['💀', '🌼', '🕯️', '¡QUÉ MIEDITO!', 'RIP CRINGE'] },
+  { id: 'stickers_animales', type: 'stickers', name: 'Animales', set: ['🐾', '🐒', '🦁', '¡GRRR!', 'MIAU'] },
   { id: 'stickers_telenovela', type: 'stickers', name: 'Telenovela', set: ['🌹', '😱', '💔', '¡TRAIDOR!', 'NOOOO'] },
   { id: 'stickers_videojuegos', type: 'stickers', name: 'Videojuegos', set: ['🎮', '👾', 'GG', 'NOOB', '+1 VIDA'] },
   { id: 'mascota_ajolote', type: 'mascota', name: 'Ajolote menta', free: true, desc: 'Viene con el juego.' },
@@ -1007,8 +1065,9 @@ const PIECE = Object.fromEntries(PIECES.map((p) => [p.id, p]));
 const MASCOTAS = PIECES.filter((p) => p.type === 'mascota');
 // Productos: lo que se compra con dinero (o con monedas).
 const PAQUETES = [
-  { id: 'paquete_muertos', name: 'Día de Muertos', icon: '💀', usd: 2.99, coins: 2500, special: true, nuevo: true, desc: 'Calaveritas, ofrendas y la Catrina en el tianguis.',
-    items: ['tema_muertos', 'marco_cempasuchil', 'fondo_altar', 'letra_azucar', 'entrada_difuntos', 'reaccion_huesitos', 'stickers_muertos'] },
+  // El id se quedó como paquete_muertos (así está en Google Play y en Mercado Pago), pero ahora es el paquete de Animales.
+  { id: 'paquete_muertos', name: 'Animales', icon: '🐾', usd: 2.99, coins: 2500, special: true, nuevo: true, desc: 'Animales con problemas de humanos.',
+    items: ['tema_animales', 'marco_leopardo', 'fondo_selva', 'letra_selva', 'entrada_rugido', 'reaccion_animales', 'stickers_animales'] },
   { id: 'paquete_mexico', name: 'Puro México', icon: '🌮', usd: 1.99, coins: 1500, desc: 'Tianguis, luchadores y el de los camotes.',
     items: ['tema_mexico', 'marco_madera', 'fondo_papel', 'letra_rye', 'entrada_mariachi', 'reaccion_publico', 'stickers_mexico'] },
   { id: 'paquete_terror', name: 'Noche de terror', icon: '🕯️', usd: 1.99, coins: 1500, desc: 'Monstruos con problemas de la vida diaria.',
@@ -1039,7 +1098,7 @@ const FONDO_CSS = {
   fondo_panteon: 'radial-gradient(circle at 82% 9%,#f1faee 0 26px,rgba(241,250,238,.18) 28px,transparent 90px),linear-gradient(#14142b,#2d1b4e 70%,#1b1b2f)',
   fondo_pantalla: 'linear-gradient(rgba(0,255,170,.09) 1px,transparent 1px) 0 0/22px 22px,linear-gradient(90deg,rgba(0,255,170,.09) 1px,transparent 1px) 0 0/22px 22px,#0a0f14',
   fondo_xochimilco: 'radial-gradient(ellipse at 30% 105%,rgba(255,255,255,.18),transparent 60%),linear-gradient(#0f5257,#127475 60%,#0b3c49)',
-  fondo_altar: 'radial-gradient(circle at 18% 94%,rgba(255,183,3,.6),transparent 16%),radial-gradient(circle at 82% 94%,rgba(255,183,3,.6),transparent 16%),radial-gradient(ellipse at 50% 100%,rgba(251,133,0,.55),transparent 34%),linear-gradient(#240046,#5a189a 55%,#9d0208)',
+  fondo_selva: 'radial-gradient(ellipse 30% 18% at 8% 100%,#2d6a4f 60%,transparent 62%),radial-gradient(ellipse 34% 20% at 92% 100%,#1b4332 60%,transparent 62%),radial-gradient(ellipse 18% 40% at 0 30%,#40916c 55%,transparent 57%),radial-gradient(ellipse 18% 40% at 100% 22%,#2d6a4f 55%,transparent 57%),radial-gradient(circle at 70% 14%,rgba(255,214,10,.5),transparent 22%),linear-gradient(#74c69d,#40916c 55%,#1b4332)',
   fondo_telon: 'linear-gradient(rgba(212,160,23,.95) 0 10px,transparent 10px),radial-gradient(ellipse at 50% -10%,rgba(0,0,0,.5),transparent 60%),repeating-linear-gradient(90deg,#7f0b1c 0 22px,#a4161a 22px 34px,#660708 34px 46px)',
   fondo_arcade: 'repeating-linear-gradient(90deg,rgba(255,0,170,.4) 0 2px,transparent 2px 48px) 0 100%/100% 36% no-repeat,repeating-linear-gradient(0deg,rgba(255,0,170,.4) 0 2px,transparent 2px 26px) 0 100%/100% 36% no-repeat,radial-gradient(circle at 50% 64%,#ffb703 0 8%,#fb5607 9% 12%,transparent 13%),linear-gradient(#10002b,#3c096c 64%,#10002b 64%)',
   fondo_antro: 'radial-gradient(circle at 15% 15%,rgba(255,0,110,.5),transparent 40%),radial-gradient(circle at 85% 22%,rgba(58,134,255,.5),transparent 40%),radial-gradient(circle at 50% 92%,rgba(131,56,236,.45),transparent 45%),#0d0221',
@@ -1508,7 +1567,7 @@ const Ads = {
   banner(show) { this.quiere = show; this.refrescar(); },
   // El banner solo va en la pantalla de resultados y se esconde si hay una hoja o la tienda encima.
   refrescar() {
-    const want = this.quiere && this.activos() && !overlay && $('#sheet').hidden && $('#doc').hidden;
+    const want = this.quiere && this.activos() && !overlay && $('#sheet').hidden && $('#doc').hidden && $('#ajustes').hidden;
     if (CFG.ADS === 'prueba') { $('#ad-slot').hidden = !want; return; }
     if (CFG.ADS === 'adsense') {
       // El banner vive en la pantalla de resultados; se pide uno nuevo cada vez que se llega ahí.
@@ -1741,13 +1800,10 @@ Object.assign(ENTRADAS, {
   },
 });
 Object.assign(ENTRADAS, {
-  entrada_difuntos: (t) => {
-    const mel = [[69, 0], [72, 0.16], [76, 0.32], [74, 0.48], [72, 0.64], [71, 0.8], [69, 0.96], [64, 1.2]];
-    mel.forEach(([m, o], i) => {
-      Sfx.tone(t + o, { type: 'triangle', f: N(m), d: i === mel.length - 1 ? 0.8 : 0.22, v: 0.13, pluck: true });
-      Sfx.tone(t + o, { f: N(m + 12), d: 0.12, v: 0.04, pluck: true });
-    });
-    Sfx.tone(t + 1.2, { f: N(88), d: 1.2, v: 0.05, pluck: true });
+  entrada_rugido: (t) => {
+    [0, 0.14, 0.28].forEach((o, i) => Sfx.tone(t + o, { f: 180 - i * 25, to: 90, d: 0.12, v: 0.3, pluck: true }));
+    Sfx.noise(t + 0.45, { d: 1.1, v: 0.35, lp: 520, a: 0.08, pluck: false });
+    Sfx.tone(t + 0.45, { type: 'sawtooth', f: 95, to: 62, d: 1.1, v: 0.12, lp: 600, a: 0.08, vib: 9, rate: 13 });
   },
   entrada_drama: (t) => [[0, 48, 0.22], [0.3, 47, 0.22], [0.6, 44, 1.3]].forEach(([o, m, d], i) => {
     [0, 7, 12].forEach((h) => Sfx.tone(t + o, { type: 'sawtooth', f: N(m + h), d, v: 0.07, lp: 1400, a: 0.01, vib: i === 2 ? 5 : 0, rate: 6 }));
@@ -1759,14 +1815,12 @@ Object.assign(ENTRADAS, {
   },
 });
 Object.assign(REACCIONES, {
-  reaccion_huesitos: (t, v) => {
-    const x = (o, m, d = 0.15, vol = 0.12) => Sfx.tone(t + o, { type: 'triangle', f: N(m), d, v: vol, pluck: true });
-    const rattle = (o, n) => { for (let i = 0; i < n; i++) Sfx.noise(t + o + i * 0.04, { d: 0.03, v: 0.07, bp: 1800 + Math.random() * 900, q: 4 }); };
-    if (v === 1) { rattle(0, 8); x(0.35, 52, 0.5); }
-    else if (v === 2) { x(0, 60); x(0.15, 57, 0.3); }
-    else if (v === 3) rattle(0, 5);
-    else if (v === 4) { x(0, 72); x(0.12, 76, 0.3); }
-    else { [72, 76, 79, 84].forEach((m, i) => x(i * 0.08, m, 0.2, 0.1)); rattle(0.35, 6); }
+  reaccion_animales: (t, v) => {
+    if (v === 1) Sfx.tone(t, { type: 'sawtooth', f: 150, to: 120, d: 0.9, v: 0.1, lp: 700, a: 0.08, vib: 4, rate: 4 });
+    else if (v === 2) for (let i = 0; i < 2; i++) Sfx.tone(t + i * 0.22, { type: 'square', f: 140, to: 110, d: 0.16, v: 0.08, lp: 900, q: 4 });
+    else if (v === 3) for (let i = 0; i < 3; i++) Sfx.tone(t + i * 0.12, { type: 'square', f: 900, to: 620, d: 0.09, v: 0.06, bp: 1400, q: 3 });
+    else if (v === 4) for (let i = 0; i < 2; i++) Sfx.tone(t + i * 0.14, { f: 2600, to: 3400, d: 0.08, v: 0.09, pluck: true });
+    else { Sfx.tone(t, { type: 'triangle', f: 500, to: 1100, d: 0.25, v: 0.12 }); [0.28, 0.4, 0.52].forEach((o) => Sfx.tone(t + o, { type: 'triangle', f: 900, to: 1300, d: 0.1, v: 0.1, pluck: true })); }
   },
   reaccion_suspiros: (t, v) => {
     if (v === 1) Sfx.noise(t, { d: 0.5, v: 0.14, bp: 1100, q: 2, a: 0.02 });
@@ -3567,7 +3621,7 @@ function applyState(st) {
     if (!st.players.some((p) => p.id === me.id)) return;
     clearInterval(joining.iv); joining = null; setBusy(false); keepAwake(); rememberRoom();
   }
-  if (prevPhase && prevPhase !== st.phase) closeSheet(false);
+  if (prevPhase && prevPhase !== st.phase) { closeSheet(false); cerrarAjustes(true); }
   if (st.phase === 'drawing' && drawKey() !== drawRound) {
     drawRound = drawKey(); tickSec = 0; resetCanvas();
     for (const k in cache) if (+k.split(':')[0] < st.round - 1) delete cache[k];
@@ -3589,8 +3643,9 @@ function render() {
   if (!(inRoom && S.phase === 'gallery' && S.reveal)) setFondo(null);
   Ads.banner(inRoom && S.phase === 'results');
   $('#home-coins').hidden = !!(inRoom || overlay);
-  if (overlay && (!inRoom || S.phase === 'lobby')) { if (inRoom) renderLobby(); return show(overlay); }
+  if (overlay && (!inRoom || S.phase === 'lobby')) { cerrarAjustes(true); if (inRoom) renderLobby(); return show(overlay); }
   overlay = null;
+  if (!inRoom || !isHost || (S.phase !== 'lobby' && S.phase !== 'results')) cerrarAjustes(true);
   if (!inRoom) { renderHome(); return show('home'); }
   placeHostSettings();
   show(({ lobby: renderLobby, drawing: renderDraw, gallery: renderGallery, accuse: renderAccuse, guess: renderGuess, album: renderAlbum, results: renderResults })[S.phase]());
@@ -3635,41 +3690,60 @@ function placeHostSettings() {
   const hs = $('#host-set'), slot = isHost && S.phase === 'results' ? $('#slot-results') : $('#slot-lobby');
   if (hs.parentNode !== slot) slot.appendChild(hs);
   const propio = S.mode === 'propio', J = JUEGOS[S.juego] || JUEGOS.clasico;
+  const imp = S.juego === 'impostor', tel = S.juego === 'telefono', escribe = propio && !imp && !tel;
+  const packs = S.packs.filter((id) => PIECE[id]).map((id) => PIECE[id].name);
+  const packTxt = packs.length > 2 ? `${packs.slice(0, 2).join(', ')} y ${packs.length - 2} más` : packs.join(' y ');
+  const secs = fmtTime(J.draw || S.drawSec);
+  // Invitados: solo ven el modo elegido y un resumen.
+  setHTML($('#guest-modo'), `<span class="modo-ico">${J.icon}</span><span class="modo-cuerpo"><b>${esc(J.name)}</b><span class="modo-txt">${esc(J.corto)}</span></span>`);
+  const temaTxt = imp ? '' : tel ? `Temas de: ${packTxt}.` : propio ? `${nameOf(S.hostId)} escribe el tema.` : `Tema al azar de: ${packTxt}.`;
+  $('#guest-set').textContent = `${temaTxt} ${secs} para dibujar.`.trim();
+  if (!isHost) return;
+  setHTML($('#hs-juego'), Object.entries(JUEGOS).filter(([, j]) => j.listo !== false).map(([id, j]) =>
+    `<button class="modo${S.juego === id ? ' on' : ''}" data-juego="${id}" aria-pressed="${S.juego === id}">
+      <span class="modo-ico" aria-hidden="true">${j.icon}</span><b>${esc(j.name)}</b><span class="modo-txt">${esc(j.corto)}</span>${j.min ? `<span class="pill">${j.min}+ jugadores</span>` : ''}</button>`).join(''));
+  $('#hs-prompt-box').hidden = !escribe;
+  $('#hs-resumen').textContent = [S.pub ? 'Sala pública' : 'Sala privada', `hasta ${S.max}`, `${secs} para dibujar`,
+    imp ? 'temas del Impostor' : escribe ? 'tema escrito por ti' : packTxt, S.live ? 'Modo Live' : ''].filter(Boolean).join(' · ');
+  // Hoja de ajustes
   document.querySelectorAll('#hs-mode button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.mode === S.mode));
   document.querySelectorAll('#hs-pub button').forEach((b) => b.setAttribute('aria-pressed', (b.dataset.pub === '1') === !!S.pub));
-  const imp = S.juego === 'impostor', tel = S.juego === 'telefono';
   $('#hs-mode').hidden = imp || tel;
-  $('#hs-prompt').hidden = !propio || imp || tel;
-  $('#lobby-packs').hidden = (propio && !tel) || imp;
-  $('#hs-tema-title').textContent = imp ? 'Temas' : tel ? 'Temas para empezar las cadenas' : 'Tema de la ronda';
-  $('#hs-tema-note').hidden = !imp;
-  $('#hs-tema-note').textContent = 'El Impostor usa sus propias parejas de temas parecidos.';
-  if (isHost) {
-    setHTML($('#lobby-packs'), PIECES.filter((i) => i.type === 'tema').map((it) => (Inv.has(it.id)
-      ? `<button class="chip${S.packs.includes(it.id) ? ' on' : ''}" data-pack="${it.id}" aria-pressed="${S.packs.includes(it.id)}">${it.icon} ${esc(it.name)}</button>`
-      : (S.phase === 'lobby' ? `<button class="chip locked" data-shop="paquetes">${it.icon} ${esc(it.name)}</button>` : ''))).join(''));
-    const times = [...new Set([...DRAW_TIMES, CFG.DRAW_SECONDS])].sort((a, b) => a - b);
-    setHTML($('#hs-time'), J.draw ? `<p class="hint left">${J.name}: ${fmtTime(J.draw)} para dibujar, siempre.</p>`
-      : times.map((s) => `<button class="chip${S.drawSec === s ? ' on' : ''}" data-time="${s}" aria-pressed="${S.drawSec === s}">${fmtTime(s)}</button>`).join(''));
-    const n = S.players.filter((p) => !p.gone).length;
-    setHTML($('#hs-max'), MAX_OPCIONES.map((m) => `<button class="chip${S.max === m ? ' on' : ''}" data-max="${m}" aria-pressed="${S.max === m}"${m < n ? ' disabled' : ''}>${m}</button>`).join(''));
-    setHTML($('#hs-juego'), Object.entries(JUEGOS).filter(([, j]) => j.listo !== false).map(([id, j]) =>
-      `<button class="chip${S.juego === id ? ' on' : ''}" data-juego="${id}" aria-pressed="${S.juego === id}">${j.icon} ${esc(j.name)}</button>`).join(''));
-    $('#hs-juego-desc').textContent = J.desc + (J.min ? ` Mínimo ${J.min} jugadores.` : '');
-    $('#hs-pub-note').textContent = S.pub ? 'Aparece en la lista de salas del inicio. Cualquiera puede entrar hasta llenarla.' : 'Solo entra quien tenga el código.';
-    document.querySelectorAll('#hs-live button').forEach((b) => b.setAttribute('aria-pressed', (b.dataset.live === '1') === !!S.live));
-    $('#hs-live-box').hidden = !S.live;
-    if (S.live) {
-      const inp = $('#hs-live-user');
-      if (document.activeElement !== inp && !inp.value) inp.value = store.get('aoc-live-user') || '';
-      $('#hs-live-status').textContent = !Live.usuario ? 'Escribe tu usuario y en tu PC abre el puente: node puente.mjs tu_usuario'
-        : Live.vivo() ? `✔ Puente conectado al LIVE de @${Live.usuario}. El chat ya puede votar.`
-        : `Esperando el puente… En tu PC corre: node puente.mjs ${Live.usuario}`;
-    }
+  $('#lobby-packs').hidden = escribe || imp;
+  $('#hs-tema-title').textContent = tel ? 'Temas para empezar las cadenas' : 'Temas';
+  $('#hs-tema-note').hidden = !(imp || escribe);
+  $('#hs-tema-note').textContent = imp ? 'El Impostor usa sus propias parejas de temas parecidos.' : 'Escribe el tema en la sala, abajo de los modos de juego.';
+  setHTML($('#lobby-packs'), PIECES.filter((i) => i.type === 'tema').map((it) => (Inv.has(it.id)
+    ? `<button class="chip${S.packs.includes(it.id) ? ' on' : ''}" data-pack="${it.id}" aria-pressed="${S.packs.includes(it.id)}">${it.icon} ${esc(it.name)}</button>`
+    : (S.phase === 'lobby' ? `<button class="chip locked" data-shop="paquetes">${it.icon} ${esc(it.name)}</button>` : ''))).join(''));
+  const times = [...new Set([...DRAW_TIMES, CFG.DRAW_SECONDS])].sort((a, b) => a - b);
+  setHTML($('#hs-time'), J.draw ? `<p class="hint left">${J.name}: ${fmtTime(J.draw)} para dibujar, siempre.</p>`
+    : times.map((s) => `<button class="chip${S.drawSec === s ? ' on' : ''}" data-time="${s}" aria-pressed="${S.drawSec === s}">${fmtTime(s)}</button>`).join(''));
+  const n = S.players.filter((p) => !p.gone).length;
+  setHTML($('#hs-max'), MAX_OPCIONES.map((m) => `<button class="chip${S.max === m ? ' on' : ''}" data-max="${m}" aria-pressed="${S.max === m}"${m < n ? ' disabled' : ''}>${m}</button>`).join(''));
+  $('#hs-pub-note').textContent = S.pub ? 'Aparece en la lista de salas del inicio. Cualquiera puede entrar hasta llenarla.' : 'Solo entra quien tenga el código.';
+  document.querySelectorAll('#hs-live button').forEach((b) => b.setAttribute('aria-pressed', (b.dataset.live === '1') === !!S.live));
+  $('#hs-live-box').hidden = !S.live;
+  if (S.live) {
+    const inp = $('#hs-live-user');
+    if (document.activeElement !== inp && !inp.value) inp.value = store.get('aoc-live-user') || '';
+    $('#hs-live-status').textContent = !Live.usuario ? 'Escribe tu usuario y en tu PC abre el puente: node puente.mjs tu_usuario'
+      : Live.vivo() ? `✔ Puente conectado al LIVE de @${Live.usuario}. El chat ya puede votar.`
+      : `Esperando el puente… En tu PC corre: node puente.mjs ${Live.usuario}`;
   }
-  const packs = S.packs.filter((id) => PIECE[id]).map((id) => PIECE[id].name).join(', ');
-  const temaTxt = imp ? '' : tel ? `Temas de: ${packs}.` : propio ? `${nameOf(S.hostId)} escribe el tema.` : `Tema al azar de: ${packs}.`;
-  $('#guest-set').textContent = `Modo ${J.name}. ${temaTxt} ${fmtTime(J.draw || S.drawSec)} para dibujar.`.replace(/\s+/g, ' ');
+}
+function abrirAjustes() {
+  if (!isHost || !S) return;
+  closeSheet(true);
+  $('#ajustes').hidden = false;
+  $('#ajustes .sheet').focus();
+  Ads.refrescar();
+}
+function cerrarAjustes(silencio) {
+  if ($('#ajustes').hidden) return;
+  $('#ajustes').hidden = true;
+  Ads.refrescar();
+  if (!silencio && S && S.mode === 'propio' && S.juego !== 'impostor' && S.juego !== 'telefono' && !$('#hs-prompt').value.trim()) $('#hs-prompt').focus();
 }
 
 function lobbyHint() {
@@ -3689,7 +3763,8 @@ function renderLobby() {
   lb.hidden = !(isHost && S.live);
   if (!lb.hidden) {
     const base = webBase(), url = base ? `${base}?sala=${S.code}` : '';
-    $('#live-url').textContent = (base || 'arteocringe.seakingsstudios.com').replace(/^https?:\/\//, '').replace(/\/(index\.html)?$/, '');
+    // Si el dominio no cabe, se parte después de un punto y no a media palabra.
+    $('#live-url').innerHTML = esc((base || 'arteocringe.seakingsstudios.com').replace(/^https?:\/\//, '').replace(/\/(index\.html)?$/, '')).replace(/\./g, '.<wbr>');
     $('#live-code').textContent = S.code;
     if (url) Live.qr($('#live-qr'), url);
   }
@@ -4307,10 +4382,12 @@ async function shareBlob(blob, filename) {
 
 /* ---------- guardar galería como imagen ---------- */
 const FRAME_PAINT = {
-  cempasuchil(x, X, Y, s) {
-    x.fillStyle = '#5a189a'; x.fillRect(X, Y, s, s);
-    for (let a = X + 8; a < X + s; a += 16) for (let b = Y + 8; b < Y + s; b += 16) { x.fillStyle = '#fb8500'; x.beginPath(); x.arc(a, b, 6, 0, 7); x.fill(); x.fillStyle = '#ffb703'; x.beginPath(); x.arc(a - 2, b - 2, 3, 0, 7); x.fill(); }
-    x.strokeStyle = '#3c096c'; x.lineWidth = 4; x.strokeRect(X + 2, Y + 2, s - 4, s - 4);
+  leopardo(x, X, Y, s) {
+    x.fillStyle = '#e9b44c'; x.fillRect(X, Y, s, s);
+    const roseta = (a, b, r) => { x.fillStyle = '#c98a2b'; x.beginPath(); x.ellipse(a, b, r * 0.5, r * 0.45, 0, 0, 7); x.fill(); x.strokeStyle = '#3d2b1f'; x.lineWidth = r * 0.45; for (let k = 0; k < 3; k++) { x.beginPath(); x.ellipse(a, b, r * 0.8, r * 0.7, 0, k * 2.1, k * 2.1 + 1.6); x.stroke(); } };
+    for (let a = X + 8; a < X + s; a += 23) for (let b = Y + 8; b < Y + s; b += 19) roseta(a + ((b - Y) % 2 ? 6 : 0), b, 8);
+    x.fillStyle = '#3d2b1f'; for (let a = X + 18; a < X + s; a += 17) for (let b = Y + 3; b < Y + s; b += 23) { x.beginPath(); x.arc(a, b, 2.2, 0, 7); x.fill(); }
+    x.lineWidth = 4; x.strokeRect(X + 2, Y + 2, s - 4, s - 4);
   },
   corazones(x, X, Y, s) {
     const g = x.createLinearGradient(X, Y, X + s, Y + s); g.addColorStop(0, '#c9184a'); g.addColorStop(0.5, '#ff4d6d'); g.addColorStop(1, '#a4133c');
@@ -4538,10 +4615,12 @@ $('#hs-live-user').addEventListener('change', (e) => {
   e.target.value = u; store.set('aoc-live-user', u);
   if (isHost && H.st && H.st.live) Live.conectar(u).then(render);
 });
+$('#btn-ajustes').onclick = abrirAjustes;
+document.querySelectorAll('[data-ajustes-cerrar]').forEach((b) => { b.onclick = () => cerrarAjustes(); });
 $('#btn-salas').onclick = () => Salas.cargar();
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
-  if (!$('#doc').hidden) $('#doc-close').click(); else closeSheet(false);
+  if (!$('#doc').hidden) $('#doc-close').click(); else if (!$('#ajustes').hidden) cerrarAjustes(); else closeSheet(false);
 });
 document.addEventListener('pointerdown', () => { if (Sfx.on) Sfx.init(); }, { once: true });
 $('#btn-sound').onclick = () => setSound(!Sfx.on);
@@ -4613,7 +4692,6 @@ $('#hs-mode').onclick = (e) => {
   const b = e.target.closest('[data-mode]');
   if (!b || !isHost) return;
   H.setMode(b.dataset.mode);
-  if (b.dataset.mode === 'propio') setTimeout(() => $('#hs-prompt').focus(), 0);
 };
 $('#hs-prompt').addEventListener('input', (e) => { if (isHost) H.setCustom(e.target.value); });
 $('#btn-invite').onclick = () => {
