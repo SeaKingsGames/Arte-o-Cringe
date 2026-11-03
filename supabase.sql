@@ -314,9 +314,11 @@ insert into public.precios_web (id, nombre, mxn) values
   ('mascota_gato', 'Gato juez', 59), ('mascota_salchicha', 'Salchicha', 59), ('mascota_fantasma', 'Fantasmita', 59),
   ('mascota_taco', 'Taquito', 59), ('mascota_pollito', 'Pollito', 59),
   ('sin_anuncios', 'Sin anuncios', 99),
-  ('paquete_muertos', 'Día de Muertos', 59), ('paquete_telenovela', 'Telenovela', 39), ('paquete_videojuegos', 'Videojuegos', 39),
+  ('paquete_muertos', 'Animales', 59), ('paquete_telenovela', 'Telenovela', 39), ('paquete_videojuegos', 'Videojuegos', 39),
   ('mascota_xolo', 'Xolo', 59), ('mascota_calaverita', 'Calaverita', 59), ('mascota_mapache', 'Mapache', 59)
 on conflict (id) do nothing;   -- si ya cambiaste un precio, no lo regresa
+-- El paquete Día de Muertos ahora es "Animales" (mismo id, así lo que ya compraron se conserva).
+update public.precios_web set nombre = 'Animales' where id = 'paquete_muertos' and nombre = 'Día de Muertos';
 
 create table if not exists public.pagos_web (
   id text primary key,                 -- número de operación de Mercado Pago
