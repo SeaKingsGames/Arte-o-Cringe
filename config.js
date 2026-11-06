@@ -15,7 +15,7 @@ window.AOC_CONFIG = {
 
   // true = anuncios de prueba de Google (para ti y tus testers, no generan dinero ni te ponen en riesgo).
   // Cámbialo a false cuando el juego salga a producción.
-  ADS_PRUEBA: true,
+  ADS_PRUEBA: false,
 
   // Cámbialo a true el día que el juego ya esté publicado en Google Play:
   // aparece el botón «Descargar para Android» en la web y en la página /descargar.
