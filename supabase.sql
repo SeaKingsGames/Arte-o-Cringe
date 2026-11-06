@@ -111,7 +111,9 @@ insert into public.catalogo (id, monedas) values
   ('mascota_gato', 2500), ('mascota_salchicha', 2500), ('mascota_fantasma', 2500),
   ('mascota_taco', 2500), ('mascota_pollito', 2500),
   ('paquete_muertos', 2500), ('paquete_telenovela', 1500), ('paquete_videojuegos', 1500),
-  ('mascota_xolo', 2500), ('mascota_calaverita', 2500), ('mascota_mapache', 2500)
+  ('mascota_xolo', 2500), ('mascota_calaverita', 2500), ('mascota_mapache', 2500),
+  ('pincel_crayon', 1200), ('pincel_neon', 1200), ('pincel_aerosol', 1200), ('pincel_arcoiris', 1200),
+  ('pincel_brillantina', 1200), ('pincel_caligrafia', 1200), ('pinceles_todos', 5000)
 on conflict (id) do update set monedas = excluded.monedas;
 
 -- Crea el perfil si no existe y reinicia los contadores del día y de la semana.
@@ -315,7 +317,10 @@ insert into public.precios_web (id, nombre, mxn) values
   ('mascota_taco', 'Taquito', 59), ('mascota_pollito', 'Pollito', 59),
   ('sin_anuncios', 'Sin anuncios', 99),
   ('paquete_muertos', 'Animales', 59), ('paquete_telenovela', 'Telenovela', 39), ('paquete_videojuegos', 'Videojuegos', 39),
-  ('mascota_xolo', 'Xolo', 59), ('mascota_calaverita', 'Calaverita', 59), ('mascota_mapache', 'Mapache', 59)
+  ('mascota_xolo', 'Xolo', 59), ('mascota_calaverita', 'Calaverita', 59), ('mascota_mapache', 'Mapache', 59),
+  ('pincel_crayon', 'Pincel Crayón', 29), ('pincel_neon', 'Pincel Neón', 29), ('pincel_aerosol', 'Pincel Aerosol', 29),
+  ('pincel_arcoiris', 'Pincel Arcoíris', 29), ('pincel_brillantina', 'Pincel Brillantina', 29), ('pincel_caligrafia', 'Pincel Caligrafía', 29),
+  ('pinceles_todos', 'Estuche de pinceles', 79)
 on conflict (id) do nothing;   -- si ya cambiaste un precio, no lo regresa
 -- El paquete Día de Muertos ahora es "Animales" (mismo id, así lo que ya compraron se conserva).
 update public.precios_web set nombre = 'Animales' where id = 'paquete_muertos' and nombre = 'Día de Muertos';

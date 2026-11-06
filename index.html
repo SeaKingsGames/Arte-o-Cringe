@@ -382,8 +382,8 @@
   .rank-list li.me{box-shadow:inset 0 0 0 2px var(--gold-hi)}
   .earn{color:var(--gold-hi);font-weight:800;text-align:center}
   @media (prefers-reduced-motion:reduce){.pet svg,.pet::before,.pet::after{animation:none!important}}
-  /* 3 grosores + cubeta + borrador + deshacer + borrar caben en celulares de 320px */
-  .toolrow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+  /* pincel + 3 grosores + cubeta + borrador + deshacer + borrar caben en celulares de 320px */
+  .toolrow{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:5px}
   .toolrow .sizes{display:contents}
   .toolrow .tool{min-width:0;width:100%}
   /* Espacio para el banner de AdMob (va encima del juego, abajo de la pantalla) */
@@ -545,6 +545,29 @@
   .aj-pie{position:sticky;bottom:calc(-18px - var(--safe-area-inset-bottom,env(safe-area-inset-bottom,0px)));margin:0 -16px calc(-18px - var(--safe-area-inset-bottom,env(safe-area-inset-bottom,0px)));
     padding:12px 16px calc(18px + var(--safe-area-inset-bottom,env(safe-area-inset-bottom,0px)));background:var(--wall-2);box-shadow:0 -10px 18px rgba(5,20,24,.35)}
   .aj-pie .btn{width:100%}
+
+  /* Pinceles: lista para elegir al dibujar (flota encima de los colores) */
+  .tools{position:relative}
+  .brush-pop{position:absolute;left:0;right:0;bottom:62px;z-index:5;background:var(--wall-2);border:2px solid var(--gold-hi);border-radius:16px;
+    padding:10px;box-shadow:0 14px 34px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:8px}
+  .brush-pop[hidden]{display:none}
+  .brush-title{font-weight:800;font-size:14px;color:var(--ink-dim)}
+  .brush-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  .pincel-op{display:flex;align-items:center;gap:8px;border:2px solid var(--line);background:var(--wall-3);border-radius:12px;padding:4px 8px 4px 4px;
+    color:var(--ink);font:inherit;font-size:14px;font-weight:700;text-align:left;min-height:44px}
+  .pincel-img{position:relative;flex:none;display:block}
+  .pincel-img img{width:56px;height:26px;object-fit:cover;background:#fff;border-radius:7px;display:block}
+  .pincel-img i{position:absolute;right:-6px;top:-7px;font-style:normal;font-size:13px;line-height:1;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5))}
+  .pincel-nom{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pincel-op[aria-pressed=true]{border-color:var(--gold-hi);color:var(--gold-hi)}
+  .pincel-op.locked{color:var(--ink-dim)}
+  .pincel-op.locked img{opacity:.5}
+  /* Pinceles en la tienda */
+  .tabs.five{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .tabs.five .tab{padding:10px 1px;font-size:13px}
+  .pincel-prev{width:100%;aspect-ratio:240/96;background:#fff;border-radius:10px;display:block}
+  .estuche-tira{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .estuche-tira img{width:100%;aspect-ratio:240/96;background:#fff;border-radius:8px;display:block}
 </style>
 </head>
 <body>
@@ -636,7 +659,12 @@
     </div>
     <div class="tools" id="tools">
       <div class="swatches" id="swatches"></div>
+      <div class="brush-pop" id="brush-pop" hidden>
+        <p class="brush-title">Pinceles</p>
+        <div class="brush-list" id="brush-list"></div>
+      </div>
       <div class="toolrow">
+        <button class="tool" id="t-brush" aria-label="Pincel: Lápiz" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M18.4 2.6a2 2 0 0 1 2.9 2.9L12 14.8 9.2 12z"/><path d="M9.2 12c-2.4-.2-4.1 1.3-4.4 3.6-.2 1.5-.9 2.8-2.3 3.6 3.2 1.6 7.5 1.1 9-1.6.7-1.3.6-2.6.5-2.8"/></svg></button>
         <div class="sizes" id="sizes"></div>
         <button class="tool" id="t-fill" aria-label="Cubeta: rellenar con color"><svg viewBox="0 0 24 24"><path d="m19 11-8-8-8.5 8.5a2 2 0 0 0 0 2.8l5.2 5.2a2 2 0 0 0 2.8 0z"/><path d="m5 2 5 5"/><path d="M2.5 13h15"/><path d="M22 20a2 2 0 1 1-4 0c0-1.6 1.7-2.4 2-4 .3 1.6 2 2.4 2 4z"/></svg></button>
         <button class="tool" id="t-eraser" aria-label="Borrador"><svg viewBox="0 0 24 24"><path d="M7 21h10"/><path d="M5.5 13.5 13 6l5 5-7.5 7.5a2 2 0 0 1-2.8 0l-2.2-2.2a2 2 0 0 1 0-2.8z"/><path d="m9 10 5 5"/></svg></button>
@@ -736,8 +764,9 @@
 
   <section class="screen" id="s-shop">
     <div class="shop-head"><button class="btn text" id="btn-shop-back">Volver</button><h2>Tienda</h2><span class="coins" id="shop-coins"></span></div>
-    <div class="tabs four" role="tablist" id="shop-tabs">
+    <div class="tabs five" role="tablist" id="shop-tabs">
       <button class="tab" role="tab" data-tab="paquetes">Paquetes</button>
+      <button class="tab" role="tab" data-tab="pinceles">Pinceles</button>
       <button class="tab" role="tab" data-tab="mascotas">Mascotas</button>
       <button class="tab" role="tab" data-tab="estilo">Mi estilo</button>
       <button class="tab" role="tab" data-tab="monedas">Monedas</button>
@@ -1061,8 +1090,21 @@ const PIECES = [
   { id: 'mascota_calaverita', type: 'mascota', name: 'Calaverita', usd: 2.99, coins: 2500, nuevo: true, desc: 'Dulce, pero de azúcar.' },
   { id: 'mascota_mapache', type: 'mascota', name: 'Mapache', usd: 2.99, coins: 2500, nuevo: true, desc: 'Se roba los mejores colores.' },
 ];
+// Pinceles: cambian cómo se ve el trazo. El lápiz viene con el juego; los demás se compran sueltos o en el estuche.
+PIECES.push(
+  { id: 'pincel_lapiz', type: 'pincel', name: 'Lápiz', free: true, desc: 'El de siempre.' },
+  { id: 'pincel_crayon', type: 'pincel', name: 'Crayón', usd: 1.49, coins: 1200, nuevo: true, desc: 'Textura de crayola de kínder.' },
+  { id: 'pincel_neon', type: 'pincel', name: 'Neón', usd: 1.49, coins: 1200, nuevo: true, desc: 'Brilla como letrero de antro.' },
+  { id: 'pincel_aerosol', type: 'pincel', name: 'Aerosol', usd: 1.49, coins: 1200, nuevo: true, desc: 'Grafiti de barda.' },
+  { id: 'pincel_arcoiris', type: 'pincel', name: 'Arcoíris', usd: 1.49, coins: 1200, nuevo: true, desc: 'Cambia de color solito.' },
+  { id: 'pincel_brillantina', type: 'pincel', name: 'Brillantina', usd: 1.49, coins: 1200, nuevo: true, desc: 'Como tarea de primaria.' },
+  { id: 'pincel_caligrafia', type: 'pincel', name: 'Caligrafía', usd: 1.49, coins: 1200, nuevo: true, desc: 'Trazo de pluma elegante.' },
+);
 const PIECE = Object.fromEntries(PIECES.map((p) => [p.id, p]));
 const MASCOTAS = PIECES.filter((p) => p.type === 'mascota');
+const PINCELES = PIECES.filter((p) => p.type === 'pincel');
+const ESTUCHE = { id: 'pinceles_todos', name: 'Estuche de pinceles', icon: '🖌️', usd: 3.99, coins: 5000, nuevo: true,
+  desc: 'Los 6 pinceles: crayón, neón, aerosol, arcoíris, brillantina y caligrafía.' };
 // Productos: lo que se compra con dinero (o con monedas).
 const PAQUETES = [
   // El id se quedó como paquete_muertos (así está en Google Play y en Mercado Pago), pero ahora es el paquete de Animales.
@@ -1084,7 +1126,7 @@ const PAQUETES = [
     items: ['tema_videojuegos', 'marco_pixel', 'fondo_arcade', 'letra_futuro', 'entrada_nivel', 'reaccion_arcade', 'stickers_videojuegos'] },
 ];
 const SIN_ANUNCIOS = { id: 'sin_anuncios', name: 'Sin anuncios', icon: '🚫', usd: 4.99, desc: 'Quita el anuncio de los resultados para siempre. Los anuncios para ganar monedas siguen disponibles si los quieres.' };
-const PRODUCT = Object.fromEntries([...PAQUETES, ...MASCOTAS.filter((m) => !m.free), SIN_ANUNCIOS].map((p) => [p.id, p]));
+const PRODUCT = Object.fromEntries([...PAQUETES, ...MASCOTAS.filter((m) => !m.free), ...PINCELES.filter((m) => !m.free), ESTUCHE, SIN_ANUNCIOS].map((p) => [p.id, p]));
 const DEFAULTS = { marco: 'marco_dorado', fondo: 'fondo_museo', letra: 'letra_normal', entrada: 'entrada_fanfarria', reaccion: 'reaccion_clasica', mascota: 'mascota_ajolote' };
 const SLOTS = { marco: 'f', fondo: 'b', letra: 'l', entrada: 'e', reaccion: 'r', mascota: 'm' };
 const storePrices = {};   // precios reales de Google Play en la moneda del jugador
@@ -1194,6 +1236,7 @@ const Inv = {
     if (!p) return false;
     if (p.free) return true;
     if (p.type === 'mascota') return this.owns(id);
+    if (p.type === 'pincel') return this.owns(id) || this.owns(ESTUCHE.id);
     return PAQUETES.some((k) => k.items.includes(id) && this.owns(k.id));
   },
   grant(pid) { this.local.add(pid); this.save(); },
@@ -4040,8 +4083,11 @@ function closeOverlay() { overlay = null; render(); }
 $('#btn-shop-back').onclick = closeOverlay;
 $('#shop-tabs').onclick = (e) => { const b = e.target.closest('.tab'); if (b) { shopTab = b.dataset.tab; renderShop(); } };
 
+// Ya es tuyo: lo compraste, o es un pincel que viene en el estuche, o es el estuche y ya tienes todos los pinceles.
+const tuyo = (pid) => Inv.owns(pid) || (PIECE[pid] && PIECE[pid].type === 'pincel' && Inv.has(pid))
+  || (pid === ESTUCHE.id && PINCELES.every((p) => Inv.has(p.id)));
 function buyButtons(prod) {
-  if (Inv.owns(prod.id)) return '<span class="buy owned">Tuyo</span>';
+  if (tuyo(prod.id)) return '<span class="buy owned">Tuyo</span>';
   // Con Mercado Pago o Google Play, el botón de dinero solo sale si el artículo ya tiene precio en la tienda.
   const dinero = CFG.PAYMENTS !== 'off' && ((CFG.PAYMENTS !== 'mercadopago' && CFG.PAYMENTS !== 'play') || storePrices[prod.id]);
   return (!dinero ? '' : `<button class="buy price" data-buy="${prod.id}" aria-label="Comprar ${esc(prod.name)} por ${priceText(prod)}">${priceText(prod)}</button>`) +
@@ -4061,6 +4107,22 @@ function petCard(p) {
   const own = Inv.has(p.id), inUse = Inv.look().m === p.id;
   const btn = !own ? buyButtons(p) : inUse ? '<span class="buy owned">Te acompaña</span>' : `<button class="buy use" data-use="${p.id}">Usar</button>`;
   return `<div class="pet-card">${petHTML(p.id, 72, 'idle')}<b>${esc(p.name)}${p.nuevo && !own ? ' <span class="pill nuevo">nuevo</span>' : ''}</b><p>${esc(p.desc)}</p><div class="pack-buy">${btn}</div></div>`;
+}
+function pincelesTab() {
+  const est = ESTUCHE, pagos = PINCELES.filter((p) => !p.free);
+  const carta = (p) => {
+    const own = Inv.has(p.id), enUso = brush === p.id;
+    const btn = !own ? buyButtons(p) : enUso ? '<span class="buy owned">En uso</span>' : `<button class="buy use" data-pincel-usar="${p.id}">Usar</button>`;
+    return `<div class="pet-card"><img class="pincel-prev" src="${previaPincel(p.id)}" alt="Muestra del trazo del pincel ${esc(p.name)}">
+      <b>${esc(p.name)}${p.nuevo && !own ? ' <span class="pill nuevo">nuevo</span>' : ''}</b><p>${esc(p.desc)}</p><div class="pack-buy">${btn}</div></div>`;
+  };
+  return `<p class="hint left">Cambian cómo se ve tu trazo. Al dibujar, toca el botón del pincel para elegir uno.</p>
+    <div class="items">
+      <div class="pack"><div class="pack-top"><span class="pv-ico">${est.icon}</span><div><b>${esc(est.name)}${!tuyo(est.id) ? '<span class="pill nuevo">ahorra</span>' : ''}</b><p>${esc(est.desc)}</p></div></div>
+        <div class="estuche-tira">${pagos.map((p) => `<img src="${previaPincel(p.id)}" alt="${esc(p.name)}">`).join('')}</div>
+        <div class="pack-buy">${buyButtons(est)}</div></div>
+      <div class="pets">${PINCELES.map(carta).join('')}</div>
+    </div>`;
 }
 function styleTab() {
   const L = Inv.look(), nm = esc((me.name || $('#name').value || 'Tu nombre').slice(0, 10));
@@ -4094,19 +4156,20 @@ function renderShop() {
   document.querySelectorAll('#shop-tabs .tab').forEach((b) => b.setAttribute('aria-selected', b.dataset.tab === shopTab));
   updateCoins();
   $('#shop-list').innerHTML = shopTab === 'paquetes' ? `<div class="items">${PAQUETES.map(packCard).join('')}</div>`
+    : shopTab === 'pinceles' ? pincelesTab()
     : shopTab === 'mascotas' ? `<p class="hint left">Tu mascota aparece junto a tu nombre y reacciona cuando se revela tu obra.</p><div class="pets">${MASCOTAS.map(petCard).join('')}</div>`
     : shopTab === 'estilo' ? styleTab() : coinsTab();
 }
 async function buyMoney(pid) {
   const prod = PRODUCT[pid];
-  if (!prod || Inv.owns(pid)) return;
+  if (!prod || tuyo(pid)) return;
   if (!(await Payments.buy(prod))) return;
   if (CFG.PAYMENTS === 'prueba') Inv.grant(pid);   // con Google Play la compra ya quedó en Payments.play
   afterBuy(prod);
 }
 function buyCoins(pid) {
   const prod = PRODUCT[pid];
-  if (!prod || Inv.owns(pid) || !prod.coins) return;
+  if (!prod || tuyo(pid) || !prod.coins) return;
   const have = Wallet.monedas;
   if (have < prod.coins) return toast(`Te faltan ${coinText(prod.coins - have)}. Juega más rondas o ve un anuncio.`);
   openSheet({ title: `¿Comprar ${prod.name}?`, text: `Usarás ${coinText(prod.coins)} de tus ${coinText(have)}.`, actions: [
@@ -4120,6 +4183,7 @@ function afterBuy(prod) {
     const t = prod.items.find((i) => PIECE[i].type === 'tema');
     if (isHost && S && t && !S.packs.includes(t)) H.togglePack(t);
   } else if (PIECE[prod.id] && PIECE[prod.id].type === 'mascota') Inv.use(prod.id);
+  else if (PIECE[prod.id] && PIECE[prod.id].type === 'pincel') setBrush(prod.id);
   Sfx.play((t) => Sfx.chime(t));
   toast(`Desbloqueaste ${prod.name}`);
   renderShop(); render();
@@ -4132,7 +4196,7 @@ function previewPack(pid) {
   setTimeout(() => previewReaction(r), 1700);
 }
 $('#shop-list').onclick = (e) => {
-  const b = e.target.closest('[data-buy],[data-coins],[data-use],[data-preview],#btn-ad,#btn-google,#btn-google-entrar,#btn-restore,#btn-recuperar');
+  const b = e.target.closest('[data-buy],[data-coins],[data-use],[data-pincel-usar],[data-preview],#btn-ad,#btn-google,#btn-google-entrar,#btn-restore,#btn-recuperar');
   if (!b) return;
   if (b.dataset.buy) buyMoney(b.dataset.buy);
   else if (b.dataset.coins) buyCoins(b.dataset.coins);
@@ -4142,6 +4206,7 @@ $('#shop-list').onclick = (e) => {
     if (p.type === 'entrada') previewEntrada(p.id); else if (p.type === 'reaccion') previewReaction(p.id);
     renderShop(); render();
   }
+  else if (b.dataset.pincelUsar) { setBrush(b.dataset.pincelUsar); toast(`Vas a dibujar con ${PIECE[b.dataset.pincelUsar].name}`); renderShop(); }
   else if (b.dataset.preview) previewPack(b.dataset.preview);
   else if (b.id === 'btn-ad') Wallet.anuncio().then(() => { if (overlay === 'shop') renderShop(); });
   else if (b.id === 'btn-google') Cuenta.vincularGoogle();
@@ -4170,19 +4235,212 @@ async function renderRanking() {
     + rule;
 }
 
+/* ---------- pinceles: cómo se pinta cada trazo ----------
+   Cada trazo guarda su pincel (b) y una semilla (z), así al deshacer se vuelve a pintar igual.
+   Los pinceles "enteros" (neón, brillantina) se repintan completos en cada movimiento sobre una
+   copia del lienzo de antes del trazo, para que el brillo no se encime en las uniones. */
+const rngDe = (seed) => () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
+const mezclar = (hex, con, t) => {
+  const a = parseInt(String(hex).slice(1), 16) || 0, b = parseInt(con.slice(1), 16);
+  const c = (s) => Math.round(((a >> s) & 255) * (1 - t) + ((b >> s) & 255) * t);
+  return `rgb(${c(16)},${c(8)},${c(0)})`;
+};
+function trazoPath(x, p) { x.beginPath(); x.moveTo(p[0][0], p[0][1]); for (let i = 1; i < p.length; i++) x.lineTo(p[i][0], p[i][1]); }
+function cadaTramo(s, from, fn) {
+  const p = s.p;
+  if (p.length === 1) return fn(p[0], p[0], 0);
+  for (let i = Math.max(1, from); i < p.length; i++) fn(p[i - 1], p[i], i);
+}
+function lapiz(x, s, from) {
+  const p = s.p;
+  x.strokeStyle = x.fillStyle = s.c; x.lineWidth = s.w; x.lineCap = x.lineJoin = 'round';
+  if (p.length === 1) { x.beginPath(); x.arc(p[0][0], p[0][1], s.w / 2, 0, Math.PI * 2); x.fill(); return; }
+  const start = Math.max(1, from);
+  x.beginPath(); x.moveTo(p[start - 1][0], p[start - 1][1]);
+  for (let i = start; i < p.length; i++) x.lineTo(p[i][0], p[i][1]);
+  x.stroke();
+}
+function estrella(x, cx, cy, L) {
+  x.beginPath(); x.moveTo(cx, cy - L);
+  x.quadraticCurveTo(cx, cy, cx + L, cy); x.quadraticCurveTo(cx, cy, cx, cy + L);
+  x.quadraticCurveTo(cx, cy, cx - L, cy); x.quadraticCurveTo(cx, cy, cx, cy - L);
+  x.fill();
+}
+const BRUSH = {
+  pincel_lapiz: { muestra: '#1d1d1b', draw: lapiz },
+  pincel_crayon: {
+    muestra: '#e53935',
+    draw(x, s, from) {
+      const w = s.w, base = rngDe(s.z | 0), hebras = [];
+      for (let k = 0; k < 6; k++) hebras.push([(base() - 0.5) * w * 0.75, (base() - 0.5) * w * 0.75, Math.max(1.2, w * (0.16 + base() * 0.2)), 0.35 + base() * 0.4]);
+      x.save(); x.strokeStyle = x.fillStyle = s.c; x.lineCap = 'round';
+      cadaTramo(s, from, (a, b, i) => {
+        const r = rngDe((s.z + i * 7919) | 0);
+        if (a === b) { x.globalAlpha = 0.75; x.beginPath(); x.arc(a[0], a[1], w * 0.42, 0, 7); x.fill(); }
+        for (const [ox, oy, lw, al] of hebras) {
+          const jx = (r() - 0.5) * w * 0.12, jy = (r() - 0.5) * w * 0.12;
+          if (r() < 0.12) continue;   // huequitos de textura
+          x.globalAlpha = al; x.lineWidth = lw;
+          x.beginPath(); x.moveTo(a[0] + ox, a[1] + oy); x.lineTo(b[0] + ox + jx, b[1] + oy + jy); x.stroke();
+        }
+      });
+      x.restore();
+    },
+  },
+  pincel_neon: {
+    muestra: '#4cc9f0', entero: true,
+    draw(x, s) {
+      const p = s.p, w = s.w, centro = mezclar(s.c, '#ffffff', 0.7);
+      x.save(); x.lineCap = x.lineJoin = 'round'; x.shadowColor = s.c; x.strokeStyle = x.fillStyle = s.c;
+      if (p.length === 1) {
+        x.shadowBlur = w * 1.2; x.beginPath(); x.arc(p[0][0], p[0][1], w * 0.36, 0, 7); x.fill();
+        x.shadowBlur = w * 0.4; x.fillStyle = centro; x.beginPath(); x.arc(p[0][0], p[0][1], w * 0.15, 0, 7); x.fill();
+      } else {
+        trazoPath(x, p);
+        x.shadowBlur = w * 1.2; x.lineWidth = w * 0.7; x.stroke(); x.stroke();
+        x.shadowBlur = w * 0.4; x.strokeStyle = centro; x.lineWidth = w * 0.28; x.stroke();
+      }
+      x.restore();
+    },
+  },
+  pincel_aerosol: {
+    muestra: '#8e24aa',
+    draw(x, s, from) {
+      const w = s.w, R = w * 1.1, paso = Math.max(2, w / 4), n = Math.max(6, Math.round(w * 0.9)), ds = w > 20 ? 2.2 : 1.6;
+      x.save(); x.fillStyle = s.c; x.globalAlpha = 0.85;
+      cadaTramo(s, from, (a, b, i) => {
+        const r = rngDe(((s.z | 0) ^ Math.imul(i + 1, 2654435761)) >>> 0), d = Math.hypot(b[0] - a[0], b[1] - a[1]), k = Math.max(1, Math.ceil(d / paso));
+        for (let j = 0; j < k; j++) {
+          const cx = a[0] + ((b[0] - a[0]) * j) / k, cy = a[1] + ((b[1] - a[1]) * j) / k;
+          for (let q = 0; q < n; q++) {
+            const ang = r() * Math.PI * 2, rad = R * r() * (0.35 + 0.65 * r());
+            x.fillRect(cx + Math.cos(ang) * rad, cy + Math.sin(ang) * rad, ds, ds);
+          }
+        }
+      });
+      x.restore();
+    },
+  },
+  pincel_arcoiris: {
+    muestra: '#e53935',
+    draw(x, s, from) {
+      x.save(); x.lineCap = 'round'; x.lineWidth = s.w;
+      cadaTramo(s, from, (a, b, i) => {
+        x.strokeStyle = x.fillStyle = `hsl(${((s.z % 360) + i * 4) % 360},90%,55%)`;
+        if (a === b) { x.beginPath(); x.arc(a[0], a[1], s.w / 2, 0, 7); x.fill(); return; }
+        x.beginPath(); x.moveTo(a[0], a[1]); x.lineTo(b[0], b[1]); x.stroke();
+      });
+      x.restore();
+    },
+  },
+  pincel_brillantina: {
+    muestra: '#ff5d8f', entero: true,
+    draw(x, s) {
+      const p = s.p, w = s.w, claro = mezclar(s.c, '#ffffff', 0.75), r = rngDe(s.z | 0);
+      x.save(); x.lineCap = x.lineJoin = 'round'; x.strokeStyle = x.fillStyle = s.c; x.lineWidth = w * 0.85;
+      if (p.length === 1) { x.beginPath(); x.arc(p[0][0], p[0][1], w * 0.42, 0, 7); x.fill(); } else { trazoPath(x, p); x.stroke(); }
+      for (let i = 0; i < p.length; i++) {
+        for (let q = 0; q < 2; q++) {
+          x.globalAlpha = 0.9; x.fillStyle = r() < 0.5 ? '#ffffff' : claro;
+          x.fillRect(p[i][0] + (r() - 0.5) * w * 0.8, p[i][1] + (r() - 0.5) * w * 0.8, 1.6, 1.6);
+        }
+        if (r() < (p.length === 1 ? 1 : 0.1)) {
+          x.globalAlpha = 1; x.fillStyle = r() < 0.5 ? '#ffffff' : '#ffe066';
+          estrella(x, p[i][0] + (r() - 0.5) * w * 0.7, p[i][1] + (r() - 0.5) * w * 0.7, Math.max(3, w * (0.25 + r() * 0.3)));
+        }
+      }
+      x.restore();
+    },
+  },
+  pincel_caligrafia: {
+    muestra: '#1d3557',
+    draw(x, s, from) {
+      const nx = Math.cos(-Math.PI / 4) * s.w * 0.6, ny = Math.sin(-Math.PI / 4) * s.w * 0.6;
+      x.save(); x.fillStyle = x.strokeStyle = s.c; x.lineJoin = 'round'; x.lineCap = 'round';
+      cadaTramo(s, from, (a, b) => {
+        if (a === b) { x.lineWidth = Math.max(2, s.w * 0.2); x.beginPath(); x.moveTo(a[0] - nx, a[1] - ny); x.lineTo(a[0] + nx, a[1] + ny); x.stroke(); return; }
+        x.beginPath(); x.moveTo(a[0] - nx, a[1] - ny); x.lineTo(a[0] + nx, a[1] + ny); x.lineTo(b[0] + nx, b[1] + ny); x.lineTo(b[0] - nx, b[1] - ny); x.closePath();
+        x.fill(); x.lineWidth = 1.5; x.stroke();
+      });
+      x.restore();
+    },
+  },
+};
+
+// Muestra del trazo de cada pincel (para la tienda y para elegir al dibujar).
+const previas = {};
+function previaPincel(id) {
+  if (previas[id]) return previas[id];
+  const B = BRUSH[id] || BRUSH.pincel_lapiz, c = document.createElement('canvas');
+  c.width = 240; c.height = 96;
+  const p = [];
+  for (let i = 0; i <= 70; i++) { const t = i / 70; p.push([20 + t * 200, 48 + Math.sin(t * Math.PI * 2) * 22]); }
+  B.draw(c.getContext('2d'), { c: B.muestra, w: 16, p, z: 24601, b: id }, 0);
+  return (previas[id] = c.toDataURL());
+}
+
+// Pincel elegido (se recuerda entre partidas).
+let brush = PIECE[store.get('aoc-pincel')] ? store.get('aoc-pincel') : 'pincel_lapiz';
+function pincelValido() { if (!Inv.has(brush)) brush = 'pincel_lapiz'; return brush; }
+function setBrush(id) {
+  if (!BRUSH[id] || !Inv.has(id)) return;
+  brush = id; store.set('aoc-pincel', id);
+  if (tool !== 'pen') tool = 'pen';
+  updateTools();
+}
+function pintarPinceles() {
+  const actual = pincelValido();
+  setHTML($('#brush-list'), PINCELES.map((p) => {
+    const tuyo = Inv.has(p.id);
+    return `<button class="pincel-op${tuyo ? '' : ' locked'}" data-pincel="${p.id}" aria-pressed="${actual === p.id}"${tuyo ? '' : ` aria-label="${esc(p.name)}, en la tienda"`}>
+      <span class="pincel-img"><img src="${previaPincel(p.id)}" alt="">${tuyo ? '' : '<i aria-hidden="true">🔒</i>'}</span><span class="pincel-nom">${esc(p.name)}</span></button>`;
+  }).join(''));
+}
+function abrirPinceles(abrir) {
+  const pop = $('#brush-pop');
+  pop.hidden = abrir === undefined ? !pop.hidden : !abrir;
+  $('#t-brush').setAttribute('aria-expanded', String(!pop.hidden));
+  if (!pop.hidden) pintarPinceles();
+}
+$('#t-brush').onclick = (e) => { e.stopPropagation(); abrirPinceles(); };
+$('#brush-pop').onclick = (e) => {
+  e.stopPropagation();
+  const b = e.target.closest('[data-pincel]');
+  if (!b) return;
+  const p = PIECE[b.dataset.pincel];
+  if (!Inv.has(p.id)) { toast(`El pincel ${p.name} está en la Tienda → Pinceles`); return; }
+  setBrush(p.id); abrirPinceles(false);
+};
+document.addEventListener('pointerdown', (e) => { if (!$('#brush-pop').hidden && !e.target.closest('#brush-pop,#t-brush')) abrirPinceles(false); });
+
+// Cursor del lienzo: un círculo del tamaño del trazo, con borde oscuro y claro para verse sobre cualquier color.
+const svgCursor = (svg, hx, hy) => `url("data:image/svg+xml,${encodeURIComponent(svg)}") ${hx} ${hy}, crosshair`;
+const CURSOR_CUBETA = svgCursor(`<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="-1 -1 26 26" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <g stroke="#fff" stroke-width="4.5"><path d="m19 11-8-8-8.5 8.5a2 2 0 0 0 0 2.8l5.2 5.2a2 2 0 0 0 2.8 0z"/><path d="M22 20a2 2 0 1 1-4 0c0-1.6 1.7-2.4 2-4 .3 1.6 2 2.4 2 4z"/></g>
+  <g stroke="#1d1d1b" stroke-width="2"><path d="m19 11-8-8-8.5 8.5a2 2 0 0 0 0 2.8l5.2 5.2a2 2 0 0 0 2.8 0z"/><path d="M2.5 13h15"/><path d="M22 20a2 2 0 1 1-4 0c0-1.6 1.7-2.4 2-4 .3 1.6 2 2.4 2 4z"/></g></svg>`, 24, 26);
+function updateCursor() {
+  const el = $('#cv');
+  if (tool === 'fill') { el.style.cursor = CURSOR_CUBETA; return; }
+  const r = el.getBoundingClientRect(), k = r.width ? r.width / el.width : 0.5;
+  const d = Math.max(6, Math.min(100, Math.round((tool === 'eraser' ? size * 1.6 : size) * k))), T = d + 8, h = T / 2;
+  el.style.cursor = svgCursor(`<svg xmlns="http://www.w3.org/2000/svg" width="${T}" height="${T}">
+    <circle cx="${h}" cy="${h}" r="${d / 2}" fill="none" stroke="#fff" stroke-width="3"/>
+    <circle cx="${h}" cy="${h}" r="${d / 2}" fill="none" stroke="#1d1d1b" stroke-width="1.4"/>
+    <circle cx="${h}" cy="${h}" r="1.8" fill="#1d1d1b" stroke="#fff" stroke-width="1"/></svg>`, Math.round(h), Math.round(h));
+}
+window.addEventListener('resize', () => { if (currentScreen === 'draw') updateCursor(); });
+
 /* ---------- lienzo ---------- */
 const cv = $('#cv'), ctx = cv.getContext('2d', { willReadFrequently: true });
 let strokes = [], cur = null, curId = null, color = COLORS[0], size = SIZES[1], tool = 'pen';
 
 function paintWhite() { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height); }
+// Copia del lienzo de antes del trazo actual, para los pinceles que se repintan completos.
+const baseCv = document.createElement('canvas'), baseCtx = baseCv.getContext('2d');
 function drawStroke(s, from = 0) {
-  const p = s.p;
-  ctx.strokeStyle = ctx.fillStyle = s.c; ctx.lineWidth = s.w; ctx.lineCap = ctx.lineJoin = 'round';
-  if (p.length === 1) { ctx.beginPath(); ctx.arc(p[0][0], p[0][1], s.w / 2, 0, Math.PI * 2); ctx.fill(); return; }
-  const start = Math.max(1, from);
-  ctx.beginPath(); ctx.moveTo(p[start - 1][0], p[start - 1][1]);
-  for (let i = start; i < p.length; i++) ctx.lineTo(p[i][0], p[i][1]);
-  ctx.stroke();
+  const B = BRUSH[s.b] || BRUSH.pincel_lapiz;
+  if (B.entero && from > 0) { ctx.drawImage(baseCv, 0, 0); from = 0; }
+  B.draw(ctx, s, from);
 }
 // Cubeta tipo Paint: rellena el área del color que tocaste (tolera bordes suavizados).
 function floodFill(x0, y0, hex) {
@@ -4210,7 +4468,7 @@ function floodFill(x0, y0, hex) {
   ctx.putImageData(img, 0, 0);
 }
 function redraw() { paintWhite(); for (const s of strokes) s.clear ? paintWhite() : s.fill ? floodFill(s.x, s.y, s.c) : drawStroke(s); }
-function resetCanvas() { strokes = []; cur = null; curId = null; tool = 'pen'; redraw(); updateTools(); }
+function resetCanvas() { strokes = []; cur = null; curId = null; tool = 'pen'; pincelValido(); abrirPinceles(false); redraw(); updateTools(); }
 function pos(e) {
   const r = cv.getBoundingClientRect();
   return [Math.round(((e.clientX - r.left) * cv.width) / r.width), Math.round(((e.clientY - r.top) * cv.height) / r.height)];
@@ -4225,8 +4483,10 @@ cv.addEventListener('pointerdown', (e) => {
     return;
   }
   cv.setPointerCapture(e.pointerId); curId = e.pointerId;
-  const eraser = tool === 'eraser';
-  cur = { c: eraser ? '#ffffff' : color, w: eraser ? size * 1.6 : size, p: [pos(e)] };
+  abrirPinceles(false);
+  const eraser = tool === 'eraser', b = eraser ? 'pincel_lapiz' : pincelValido();
+  cur = { c: eraser ? '#ffffff' : color, w: eraser ? size * 1.6 : size, p: [pos(e)], b, z: (Math.random() * 4294967296) >>> 0 };
+  if (BRUSH[b].entero) { baseCv.width = cv.width; baseCv.height = cv.height; baseCtx.drawImage(cv, 0, 0); }
   strokes.push(cur); drawStroke(cur);
 });
 cv.addEventListener('pointermove', (e) => {
@@ -4238,6 +4498,7 @@ cv.addEventListener('pointermove', (e) => {
   drawStroke(cur, from);
 });
 const endStroke = (e) => { if (e.pointerId === curId) { cur = null; curId = null; } };
+cv.addEventListener('pointerenter', updateCursor);
 ['pointerup', 'pointercancel', 'lostpointercapture'].forEach((ev) => cv.addEventListener(ev, endStroke));
 
 function updateTools() {
@@ -4248,6 +4509,11 @@ function updateTools() {
   document.querySelectorAll('.sizes .tool').forEach((b) => b.classList.toggle('on', +b.dataset.s === size && tool !== 'fill'));
   $('#t-eraser').classList.toggle('on', tool === 'eraser');
   $('#t-fill').classList.toggle('on', tool === 'fill');
+  const pb = PIECE[pincelValido()];
+  $('#t-brush').classList.toggle('on', tool === 'pen' && brush !== 'pincel_lapiz');
+  $('#t-brush').setAttribute('aria-label', `Pincel: ${pb.name}`);
+  if (!$('#brush-pop').hidden) pintarPinceles();
+  updateCursor();
 }
 $('#swatches').innerHTML = COLORS.map((c, i) => `<button class="sw" style="--c:${c}" data-c="${c}" aria-label="Color ${i + 1}"></button>`).join('') +
   '<label class="sw sw-pick" id="sw-pick" aria-label="Elegir otro color"><input type="color" id="pick" value="#ff8800"></label>';
