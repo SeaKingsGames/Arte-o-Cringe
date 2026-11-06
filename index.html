@@ -568,6 +568,17 @@
   .pincel-prev{width:100%;aspect-ratio:240/96;background:#fff;border-radius:10px;display:block}
   .estuche-tira{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
   .estuche-tira img{width:100%;aspect-ratio:240/96;background:#fff;border-radius:8px;display:block}
+
+  /* Texto escrito encima del dibujo */
+  .easel input.txt-in{position:absolute;z-index:3;min-width:120px;width:120px;margin:0;padding:0 4px;border:2px dashed var(--gold);border-radius:4px;background:rgba(255,255,255,.35);
+    font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;line-height:1.12;
+    text-shadow:-1px -1px 0 var(--orilla,#fff),1px -1px 0 var(--orilla,#fff),-1px 1px 0 var(--orilla,#fff),1px 1px 0 var(--orilla,#fff)}
+  .easel input.txt-in:focus{outline:none;border-color:var(--gold-hi)}
+  .easel input.txt-in::placeholder{color:rgba(29,29,27,.4);text-shadow:none}
+  .texto-op{width:100%}
+  .texto-aa{width:56px;height:26px;flex:none;display:grid;place-items:center;background:#fff;border-radius:7px;color:#1d1d1b;font-weight:800;font-size:17px}
+  .texto-op[aria-pressed=true]{border-color:var(--gold-hi);color:var(--gold-hi)}
+  .tool svg[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -655,16 +666,18 @@
     <div class="timer" id="draw-timer"><b>60</b><div class="bar"><i></i></div></div>
     <div class="easel">
       <canvas id="cv" width="720" height="720" aria-label="Lienzo para dibujar"></canvas>
+      <input class="txt-in" id="txt-in" maxlength="60" autocomplete="off" autocapitalize="sentences" enterkeyhint="done" aria-label="Texto para poner en el dibujo" placeholder="Escribe aquí" hidden>
       <div class="easel-over" id="draw-over" hidden><p id="draw-over-text"></p></div>
     </div>
     <div class="tools" id="tools">
       <div class="swatches" id="swatches"></div>
       <div class="brush-pop" id="brush-pop" hidden>
-        <p class="brush-title">Pinceles</p>
+        <p class="brush-title">Pinceles y texto</p>
         <div class="brush-list" id="brush-list"></div>
+        <button class="pincel-op texto-op" id="t-texto" aria-pressed="false"><span class="texto-aa" aria-hidden="true">Aa</span><span class="pincel-nom">Texto: escribe encima de tu dibujo</span></button>
       </div>
       <div class="toolrow">
-        <button class="tool" id="t-brush" aria-label="Pincel: Lápiz" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M18.4 2.6a2 2 0 0 1 2.9 2.9L12 14.8 9.2 12z"/><path d="M9.2 12c-2.4-.2-4.1 1.3-4.4 3.6-.2 1.5-.9 2.8-2.3 3.6 3.2 1.6 7.5 1.1 9-1.6.7-1.3.6-2.6.5-2.8"/></svg></button>
+        <button class="tool" id="t-brush" aria-label="Pincel: Lápiz" aria-expanded="false"><svg class="ico-texto" viewBox="0 0 24 24" hidden><path d="M5 6V4h14v2"/><path d="M12 4v16"/><path d="M9 20h6"/></svg><svg class="ico-pincel" viewBox="0 0 24 24"><path d="M18.4 2.6a2 2 0 0 1 2.9 2.9L12 14.8 9.2 12z"/><path d="M9.2 12c-2.4-.2-4.1 1.3-4.4 3.6-.2 1.5-.9 2.8-2.3 3.6 3.2 1.6 7.5 1.1 9-1.6.7-1.3.6-2.6.5-2.8"/></svg></button>
         <div class="sizes" id="sizes"></div>
         <button class="tool" id="t-fill" aria-label="Cubeta: rellenar con color"><svg viewBox="0 0 24 24"><path d="m19 11-8-8-8.5 8.5a2 2 0 0 0 0 2.8l5.2 5.2a2 2 0 0 0 2.8 0z"/><path d="m5 2 5 5"/><path d="M2.5 13h15"/><path d="M22 20a2 2 0 1 1-4 0c0-1.6 1.7-2.4 2-4 .3 1.6 2 2.4 2 4z"/></svg></button>
         <button class="tool" id="t-eraser" aria-label="Borrador"><svg viewBox="0 0 24 24"><path d="M7 21h10"/><path d="M5.5 13.5 13 6l5 5-7.5 7.5a2 2 0 0 1-2.8 0l-2.2-2.2a2 2 0 0 1 0-2.8z"/><path d="m9 10 5 5"/></svg></button>
@@ -923,12 +936,16 @@ CFG.DRAW_SECONDS = qn('dibujo', 5, 300) ?? CFG.DRAW_SECONDS;
 CFG.VOTE_SECONDS = qn('voto', 3, 60) ?? CFG.VOTE_SECONDS;
 const DRAW_TIMES = [30, 60, 120, 180];
 const MAX_OPCIONES = [4, 6, 8, 10, 12];
+// Versión del juego que se manda al entrar a una sala. Las versiones de antes de los modos (sin número)
+// no saben mostrar Impostor ni Teléfono descompuesto: el anfitrión no deja empezar esos modos con ellas.
+const JUEGO_V = 2;
+const JUEGO_V_MODOS = 2;
 // Modos de juego. "listo: false" los esconde mientras se terminan.
 const JUEGOS = {
   clasico: { name: 'Clásico', icon: '🎨', corto: 'Dibujen el mismo tema y califiquen del 1 al 5', desc: 'Todos dibujan el mismo tema y la sala califica cada obra del 1 al 5.' },
   relampago: { name: 'Relámpago', icon: '⚡', corto: '15 segundos para dibujar', draw: 15, vote: 10, reveal: 3000, desc: '15 segundos para dibujar y votación rápida. Puro caos.' },
-  impostor: { name: 'Impostor', icon: '🕵️', corto: 'Uno tiene otro tema. ¿Quién es?', min: 3, desc: 'A uno le toca un tema parecido pero distinto, y ni él lo sabe. Al final, adivinen quién era.' },
-  telefono: { name: 'Teléfono descompuesto', icon: '📞', corto: 'Dibuja, adivina y mira cómo se descompone', desc: 'Dibuja, adivina lo que dibujó otro, dibuja esa respuesta… y vean cómo se descompone.' },
+  impostor: { name: 'Impostor', icon: '🕵️', corto: 'Uno tiene otro tema. ¿Quién es?', min: 3, v: JUEGO_V_MODOS, desc: 'A uno le toca un tema parecido pero distinto, y ni él lo sabe. Al final, adivinen quién era.' },
+  telefono: { name: 'Teléfono descompuesto', icon: '📞', corto: 'Dibuja, adivina y mira cómo se descompone', v: JUEGO_V_MODOS, desc: 'Dibuja, adivina lo que dibujó otro, dibuja esa respuesta… y vean cómo se descompone.' },
 };
 
 /* ---------- catálogo ---------- */
@@ -1206,7 +1223,7 @@ const setHTML = (el, html) => { if (el._h !== html) { el.innerHTML = html; el._h
 const N = (m) => 440 * 2 ** ((m - 69) / 12);
 
 let toastT;
-function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2800); }
+function toast(msg, ms = 2800) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), ms); }
 function banner(msg) { $('#banner-text').textContent = msg; $('#banner').hidden = !msg; }
 
 
@@ -1913,6 +1930,7 @@ const lastReact = {};
 let drawRound = -1, sentRound = -1, lastSendAt = 0, myDrawing = null, tickSec = 0;
 let currentScreen = 'home', overlay = null, shopTab = 'paquetes', rankTab = 'semana', lobbyCount = 0;
 let autoEnd = 0;           // cuenta regresiva cuando la sala se llena
+let avisoVersion = false;  // ya avisamos que el anfitrión tiene una versión más nueva
 // Teléfono descompuesto: una misma persona dibuja en varios pasos de la ronda, así que la llave lleva el paso.
 const ck = (round, author, paso) => (paso == null ? round : round + '.' + paso) + ':' + author;
 const pasoDe = (st) => (st && st.cad && (st.phase === 'drawing' || st.phase === 'guess') ? st.cad.paso : null);
@@ -2224,7 +2242,7 @@ const H = {
       packs: packs.length ? packs : ['tema_basico'], mode: 'azar', drawSec: CFG.DRAW_SECONDS,
       pub: !!pref.pub, max: MAX_OPCIONES.includes(pref.max) ? pref.max : 8, juego: JUEGOS[pref.juego] && JUEGOS[pref.juego].listo !== false ? pref.juego : 'clasico', autoIn: 0,
       live: false, aud: null,
-      players: [{ id: me.id, dev: me.dev, name: me.name, score: 0, online: true, look: Inv.look() }],
+      players: [{ id: me.id, dev: me.dev, name: me.name, score: 0, online: true, look: Inv.look(), v: JUEGO_V }], v: JUEGO_V,
       kicked: [], roundPlayers: [], submitted: [], blanks: [], removed: [], order: [], idx: 0,
       reveal: false, verdict: null, voteCount: 0, voterCount: 0, results: null,
     };
@@ -2318,6 +2336,7 @@ const H = {
         }
         p.name = name;
         p.look = validLook(m.look); p.online = true; p.gone = false;
+        p.v = Math.max(1, Math.min(999, +m.v || 1));   // sin número = versión vieja (antes de los modos)
         this.publish();
         break;
       }
@@ -2495,6 +2514,12 @@ const H = {
     if (st.mode === 'propio' && st.pub && Filtro.malo(this.custom)) { toast('Ese tema no se puede usar en una sala pública. Escribe otro.'); $('#hs-prompt').focus(); return; }
     const j = this.juego();
     if (j.min && ready.length < j.min) { toast(`${j.name} necesita al menos ${j.min} jugadores`); return; }
+    const viejos = j.v ? ready.filter((p) => !p.bot && p.id !== me.id && (p.v || 1) < j.v) : [];
+    if (viejos.length) {
+      const quien = viejos.map((p) => p.name).join(' y ');
+      toast(`${quien} ${viejos.length > 1 ? 'tienen' : 'tiene'} una versión vieja del juego y no puede${viejos.length > 1 ? 'n' : ''} jugar ${j.name}. Que actualicen la app o entren desde la página.`, 6000);
+      return;
+    }
     this.clearTimers();
     this.autoAt = 0;
     st.round++;
@@ -3658,6 +3683,7 @@ function applyState(st) {
   if (!isHost && S && S.hostId && st.hostId !== S.hostId) return;   // otro anfitrión con el mismo código
   const prevPhase = S && S.phase;
   S = st; lastStateAt = now(); endAt = now() + (st.endsIn || 0);
+  if (!isHost && (st.v || 0) > JUEGO_V && !avisoVersion) { avisoVersion = true; toast('Hay una versión nueva del juego. Actualízala para no perderte nada.', 5000); }
   autoEnd = st.phase === 'lobby' && st.autoIn ? now() + st.autoIn : 0;
   if (hostGone) { hostGone = false; banner(''); }
   if (joining) {
@@ -3817,7 +3843,8 @@ function renderLobby() {
     petHTML(validLook(p.look).m, 30) +
     (p.id === S.hostId ? '<span class="pill host">anfitrión</span>' : '') +
     (p.bot ? `<span class="pill">bot ${(PERSONAS[p.persona] || PERSONAS.promedio).label}</span>` : '') +
-    (Blocks.has(p.dev) ? '<span class="pill blk">bloqueado</span>' : ''))}</li>`).join(''));
+    (Blocks.has(p.dev) ? '<span class="pill blk">bloqueado</span>' : '') +
+    (!p.bot && isHost && p.id !== me.id && (p.v || 1) < JUEGO_V ? '<span class="pill viejo">versión vieja</span>' : ''))}</li>`).join(''));
   const L = Inv.look();
   setHTML($('#lobby-style'), `${petHTML(L.m, 52, 'idle')}${miniFrame(L.f)}<div class="style-txt">
     <span>${nameHTML({ name: me.name || 'Tú', look: L })}</span>
@@ -4385,11 +4412,12 @@ function pincelValido() { if (!Inv.has(brush)) brush = 'pincel_lapiz'; return br
 function setBrush(id) {
   if (!BRUSH[id] || !Inv.has(id)) return;
   brush = id; store.set('aoc-pincel', id);
-  if (tool !== 'pen') tool = 'pen';
+  tool = 'pen';
   updateTools();
 }
 function pintarPinceles() {
-  const actual = pincelValido();
+  const actual = tool === 'text' ? '' : pincelValido();
+  $('#t-texto').setAttribute('aria-pressed', String(tool === 'text'));
   setHTML($('#brush-list'), PINCELES.map((p) => {
     const tuyo = Inv.has(p.id);
     return `<button class="pincel-op${tuyo ? '' : ' locked'}" data-pincel="${p.id}" aria-pressed="${actual === p.id}"${tuyo ? '' : ` aria-label="${esc(p.name)}, en la tienda"`}>
@@ -4405,6 +4433,7 @@ function abrirPinceles(abrir) {
 $('#t-brush').onclick = (e) => { e.stopPropagation(); abrirPinceles(); };
 $('#brush-pop').onclick = (e) => {
   e.stopPropagation();
+  if (e.target.closest('#t-texto')) { tool = 'text'; updateTools(); abrirPinceles(false); toast('Toca el lienzo donde quieras escribir'); return; }
   const b = e.target.closest('[data-pincel]');
   if (!b) return;
   const p = PIECE[b.dataset.pincel];
@@ -4415,12 +4444,16 @@ document.addEventListener('pointerdown', (e) => { if (!$('#brush-pop').hidden &&
 
 // Cursor del lienzo: un círculo del tamaño del trazo, con borde oscuro y claro para verse sobre cualquier color.
 const svgCursor = (svg, hx, hy) => `url("data:image/svg+xml,${encodeURIComponent(svg)}") ${hx} ${hy}, crosshair`;
-const CURSOR_CUBETA = svgCursor(`<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="-1 -1 26 26" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <g stroke="#fff" stroke-width="4.5"><path d="m19 11-8-8-8.5 8.5a2 2 0 0 0 0 2.8l5.2 5.2a2 2 0 0 0 2.8 0z"/><path d="M22 20a2 2 0 1 1-4 0c0-1.6 1.7-2.4 2-4 .3 1.6 2 2.4 2 4z"/></g>
-  <g stroke="#1d1d1b" stroke-width="2"><path d="m19 11-8-8-8.5 8.5a2 2 0 0 0 0 2.8l5.2 5.2a2 2 0 0 0 2.8 0z"/><path d="M2.5 13h15"/><path d="M22 20a2 2 0 1 1-4 0c0-1.6 1.7-2.4 2-4 .3 1.6 2 2.4 2 4z"/></g></svg>`, 24, 26);
+// Cubeta: una flecha; la punta es exactamente donde se rellena. La cubetita al lado solo indica la herramienta.
+const CURSOR_CUBETA = svgCursor(`<svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 34 34">
+  <path d="M2 2v20l5.2-5 3.6 8.4 3.6-1.6-3.6-8.2H18z" fill="#1d1d1b" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+  <g transform="translate(17 17) scale(.62)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <g stroke="#fff" stroke-width="5"><path d="m19 11-8-8-8.5 8.5a2 2 0 0 0 0 2.8l5.2 5.2a2 2 0 0 0 2.8 0z"/><path d="M22 20a2 2 0 1 1-4 0c0-1.6 1.7-2.4 2-4 .3 1.6 2 2.4 2 4z"/></g>
+    <g stroke="#1d1d1b" stroke-width="2.4"><path d="m19 11-8-8-8.5 8.5a2 2 0 0 0 0 2.8l5.2 5.2a2 2 0 0 0 2.8 0z"/><path d="M22 20a2 2 0 1 1-4 0c0-1.6 1.7-2.4 2-4 .3 1.6 2 2.4 2 4z"/></g></g></svg>`, 2, 2);
 function updateCursor() {
   const el = $('#cv');
   if (tool === 'fill') { el.style.cursor = CURSOR_CUBETA; return; }
+  if (tool === 'text') { el.style.cursor = 'text'; return; }
   const r = el.getBoundingClientRect(), k = r.width ? r.width / el.width : 0.5;
   const d = Math.max(6, Math.min(100, Math.round((tool === 'eraser' ? size * 1.6 : size) * k))), T = d + 8, h = T / 2;
   el.style.cursor = svgCursor(`<svg xmlns="http://www.w3.org/2000/svg" width="${T}" height="${T}">
@@ -4433,6 +4466,7 @@ window.addEventListener('resize', () => { if (currentScreen === 'draw') updateCu
 /* ---------- lienzo ---------- */
 const cv = $('#cv'), ctx = cv.getContext('2d', { willReadFrequently: true });
 let strokes = [], cur = null, curId = null, color = COLORS[0], size = SIZES[1], tool = 'pen';
+let txtEd = null;   // texto que se está escribiendo: { x, y, f, c }
 
 function paintWhite() { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height); }
 // Copia del lienzo de antes del trazo actual, para los pinceles que se repintan completos.
@@ -4467,8 +4501,66 @@ function floodFill(x0, y0, hex) {
   }
   ctx.putImageData(img, 0, 0);
 }
-function redraw() { paintWhite(); for (const s of strokes) s.clear ? paintWhite() : s.fill ? floodFill(s.x, s.y, s.c) : drawStroke(s); }
-function resetCanvas() { strokes = []; cur = null; curId = null; tool = 'pen'; pincelValido(); abrirPinceles(false); redraw(); updateTools(); }
+function redraw() { paintWhite(); for (const s of strokes) s.clear ? paintWhite() : s.fill ? floodFill(s.x, s.y, s.c) : s.text ? drawText(ctx, s) : drawStroke(s); }
+function resetCanvas() { cerrarTexto(false); strokes = []; cur = null; curId = null; tool = 'pen'; pincelValido(); abrirPinceles(false); redraw(); updateTools(); }
+
+/* ---------- texto escrito encima del dibujo ---------- */
+const TEXTO_TAM = { 6: 30, 16: 46, 34: 72 };
+const fuenteTexto = (f) => `800 ${f}px 'Bricolage Grotesque', system-ui, sans-serif`;
+function contraste(hex) {
+  const n = parseInt(String(hex).slice(1), 16) || 0;
+  return 0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255) > 150 ? '#1d1d1b' : '#ffffff';
+}
+function lineasTexto(x, t, maxW) {
+  const out = [];
+  let linea = '';
+  for (const w of t.split(' ')) {
+    const prueba = linea ? linea + ' ' + w : w;
+    if (linea && x.measureText(prueba).width > maxW) { out.push(linea); linea = w; } else linea = prueba;
+  }
+  if (linea) out.push(linea);
+  return out;
+}
+function drawText(x, op) {
+  x.save(); x.font = fuenteTexto(op.f); x.textBaseline = 'top'; x.lineJoin = 'round';
+  lineasTexto(x, op.t, cv.width - op.x - 12).forEach((l, i) => {
+    const y = op.y + i * op.f * 1.12;
+    x.strokeStyle = contraste(op.c); x.lineWidth = Math.max(3, op.f * 0.16); x.strokeText(l, op.x, y);
+    x.fillStyle = op.c; x.fillText(l, op.x, y);
+  });
+  x.restore();
+}
+function abrirTexto(px, py) {
+  const f = TEXTO_TAM[size] || 46;
+  txtEd = { x: Math.max(8, Math.min(px, cv.width - 230)), y: Math.max(4, Math.min(py - f / 2, cv.height - f - 8)), f, c: color };
+  const inp = $('#txt-in'), r = cv.getBoundingClientRect(), k = r.width / cv.width;
+  Object.assign(inp.style, { left: `${txtEd.x * k}px`, top: `${txtEd.y * k}px`, fontSize: `${f * k}px`, color, maxWidth: `${(cv.width - txtEd.x - 8) * k}px` });
+  inp.style.setProperty('--orilla', contraste(color));
+  inp.value = ''; inp.hidden = false; anchoTexto(); inp.focus({ preventScroll: true });
+}
+// El cuadro crece con lo que escribes (hasta la orilla del lienzo).
+function anchoTexto() {
+  if (!txtEd) return;
+  const inp = $('#txt-in'), r = cv.getBoundingClientRect(), k = r.width / cv.width, x = baseCtx;
+  x.font = fuenteTexto(txtEd.f * k);
+  const w = x.measureText(inp.value || inp.placeholder).width + 14;
+  inp.style.width = `${Math.min(Math.max(120, w), (cv.width - txtEd.x - 8) * k)}px`;
+}
+$('#txt-in').addEventListener('input', anchoTexto);
+function cerrarTexto(guardar) {
+  const inp = $('#txt-in'), ed = txtEd, t = inp.value.replace(/\s+/g, ' ').trim().slice(0, 60);
+  txtEd = null; inp.hidden = true; inp.value = '';
+  if (!ed || !guardar || !t) return;
+  if (S && S.pub && Filtro.malo(t)) { toast('Ese texto no se puede usar en una sala pública'); return; }
+  const op = { text: true, t, x: ed.x, y: ed.y, f: ed.f, c: ed.c };
+  strokes.push(op); drawText(ctx, op);
+  Sfx.play((tt) => Sfx.pop(tt, 520));
+}
+$('#txt-in').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); cerrarTexto(true); }
+  else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); cerrarTexto(false); }
+});
+$('#txt-in').addEventListener('blur', () => { if (txtEd) cerrarTexto(true); });
 function pos(e) {
   const r = cv.getBoundingClientRect();
   return [Math.round(((e.clientX - r.left) * cv.width) / r.width), Math.round(((e.clientY - r.top) * cv.height) / r.height)];
@@ -4476,6 +4568,12 @@ function pos(e) {
 cv.addEventListener('pointerdown', (e) => {
   if (cur || !S || S.phase !== 'drawing' || !inRound() || sentRound === drawKey()) return;
   e.preventDefault();
+  if (tool === 'text') {
+    if (txtEd) { cerrarTexto(true); return; }   // tocar fuera del cuadro termina el texto
+    const [tx, ty] = pos(e);
+    abrirTexto(tx, ty);
+    return;
+  }
   if (tool === 'fill') {
     const [fx, fy] = pos(e), op = { fill: true, x: fx, y: fy, c: color };
     strokes.push(op); floodFill(fx, fy, color);
@@ -4509,9 +4607,12 @@ function updateTools() {
   document.querySelectorAll('.sizes .tool').forEach((b) => b.classList.toggle('on', +b.dataset.s === size && tool !== 'fill'));
   $('#t-eraser').classList.toggle('on', tool === 'eraser');
   $('#t-fill').classList.toggle('on', tool === 'fill');
+  if (tool !== 'text' && txtEd) cerrarTexto(true);
   const pb = PIECE[pincelValido()];
-  $('#t-brush').classList.toggle('on', tool === 'pen' && brush !== 'pincel_lapiz');
-  $('#t-brush').setAttribute('aria-label', `Pincel: ${pb.name}`);
+  $('#t-brush').classList.toggle('on', tool === 'text' || (tool === 'pen' && brush !== 'pincel_lapiz'));
+  $('#t-brush').setAttribute('aria-label', tool === 'text' ? 'Herramienta: texto' : `Pincel: ${pb.name}`);
+  // En SVG "hidden" es atributo, no propiedad.
+  $('#t-brush .ico-pincel').toggleAttribute('hidden', tool === 'text'); $('#t-brush .ico-texto').toggleAttribute('hidden', tool !== 'text');
   if (!$('#brush-pop').hidden) pintarPinceles();
   updateCursor();
 }
@@ -4537,6 +4638,7 @@ function exportImage() {
 }
 function submitDrawing() {
   if (!S || S.phase !== 'drawing' || !inRound() || sentRound === drawKey()) return;
+  if (txtEd) cerrarTexto(true);
   cur = null; curId = null; sentRound = drawKey(); lastSendAt = now();
   const lastClear = strokes.map((s) => !!s.clear).lastIndexOf(true);
   const blank = strokes.length - (lastClear + 1) === 0;
@@ -4792,7 +4894,7 @@ function joinRoom(forced) {
     toast('Buscando la sala…');
     code = c; isHost = false; S = null;
     try { net = await connect(code); } catch { setBusy(false); toast('No se pudo conectar. Revisa tu internet.'); return; }
-    const hello = () => send({ t: 'hello', name: me.name, dev: me.dev, look: Inv.look() });
+    const hello = () => send({ t: 'hello', name: me.name, dev: me.dev, look: Inv.look(), v: JUEGO_V });
     joining = { tries: 0, iv: setInterval(() => {
       if (++joining.tries >= 7) { leave(); toast(`No encontramos la sala ${c}. Revisa el código.`); return; }
       hello();
